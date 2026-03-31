@@ -305,8 +305,9 @@ async function login(){
   btn.textContent='Signing in...';btn.disabled=true;
   try{
     const d=await api('load');
-    users=d.users;orders=d.orders;
-    ctr=orders.reduce((m,o)=>{const n=parseInt(o.id.replace(/\D/g,''));return n>m?n:m;},9)+1;
+    users=Array.isArray(d.users)?d.users:[];
+    orders=Array.isArray(d.orders)?d.orders:[];
+    ctr=orders.reduce((m,o)=>{const n=parseInt((o.id||'').replace(/\D/g,''));return n>m?n:m;},9)+1;
     const found=users.find(x=>x.username===u&&x.password===p);
     if(!found){document.getElementById('loginErr').textContent='Incorrect username or password.';btn.textContent='Sign in';btn.disabled=false;return;}
     cur=found;
