@@ -389,7 +389,7 @@ function render(){
         <td>${dueTag(o.dueDate,o.payment)}<br><span style="font-size:11px;color:#aaa">follow-up: </span>${fuTag(o.followUp)}</td>
         <td style="max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#888;font-size:12px" title="${o.notes||''}">${o.notes||'-'}</td>
         <td style="font-size:12px;color:#aaa">${o.addedBy||''}</td>
-        <td>${ce?`<button class="btn sm" onclick="openOrder('${o.id}')">Edit</button>`:''} <button class="btn sm blue" onclick="openExp('${o.id}','${o.client}')">Expenses</button></td>
+        <td><button class="btn sm" onclick="openOrder('${o.id}')">Edit</button> <button class="btn sm blue" onclick="openExp('${o.id}','${o.client}')">Expenses</button></td>
       </tr>`;
     }).join('');
   }
