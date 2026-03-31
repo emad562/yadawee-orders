@@ -580,6 +580,7 @@ async function saveExp(){
   closeExp();
 }
 
+function exportCSV(){
   const dc=document.getElementById('dCurr').value;
   const h=['Order ID','Date','Client','Products','Amount (original)','Currency','Amount ('+dc+')','Payment','Delivery','Due Date','Follow-up','Notes','Added By'];
   const rows=orders.map(o=>[o.id,o.date,o.client,o.products,o.total,o.currency,Math.round(frE(egp(o),dc)),o.payment,o.delivery,o.dueDate||'',o.followUp||'',o.notes||'',o.addedBy||''].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
