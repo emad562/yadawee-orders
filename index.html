@@ -7,69 +7,69 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh;}
-.app{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;}
-.login-wrap{max-width:380px;margin:5rem auto;background:#fff;border:1px solid #e0e0db;border-radius:12px;padding:2rem;}
-.login-wrap h2{font-size:20px;font-weight:500;margin-bottom:4px;}
-.login-wrap p{font-size:13px;color:#666;margin-bottom:1.5rem;}
-.form-row{margin-bottom:12px;}
-.form-row label{display:block;font-size:12px;color:#666;margin-bottom:4px;}
-.form-row input,.form-row select,.form-row textarea{width:100%;font-size:14px;padding:8px 10px;border:1px solid #e0e0db;border-radius:8px;background:#fff;color:#1a1a1a;font-family:inherit;outline:none;}
-.form-row input:focus,.form-row select:focus,.form-row textarea:focus{border-color:#1D9E75;}
-.form-row textarea{resize:vertical;min-height:60px;}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.form-grid-3{display:grid;grid-template-columns:2fr 1fr;gap:10px;}
-.btn{padding:7px 14px;border:1px solid #d0d0cb;border-radius:8px;background:transparent;color:#1a1a1a;font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit;}
+.wrap{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;}
+.login-box{max-width:380px;margin:6rem auto;background:#fff;border:1px solid #e0e0db;border-radius:12px;padding:2rem;}
+.login-box h2{font-size:20px;font-weight:500;margin-bottom:6px;}
+.login-box p{font-size:13px;color:#888;margin-bottom:1.5rem;}
+label{display:block;font-size:12px;color:#666;margin-bottom:4px;}
+input,select,textarea{width:100%;font-size:14px;padding:8px 10px;border:1px solid #e0e0db;border-radius:8px;background:#fff;color:#1a1a1a;font-family:inherit;outline:none;margin-bottom:12px;}
+input:focus,select:focus,textarea:focus{border-color:#1D9E75;}
+textarea{resize:vertical;min-height:64px;margin-bottom:0;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:10px;}
+@media(max-width:520px){.g2,.g21{grid-template-columns:1fr;}}
+.btn{padding:7px 14px;border:1px solid #ccc;border-radius:8px;background:transparent;color:#1a1a1a;font-size:13px;cursor:pointer;font-family:inherit;}
 .btn:hover{background:#f0f0ed;}
-.btn.primary{background:#1D9E75;color:#fff;border-color:#1D9E75;width:100%;padding:10px;}
-.btn.primary:hover{background:#0F6E56;}
-.btn.primary.slim{width:auto;padding:7px 14px;}
-.btn.danger{border-color:#E24B4A;color:#A32D2D;}
-.btn.danger:hover{background:#fff0f0;}
-.btn.export{border-color:#185FA5;color:#185FA5;}
-.btn.export:hover{background:#eef4fb;}
+.btn.green{background:#1D9E75;color:#fff;border-color:#1D9E75;width:100%;padding:10px;font-size:14px;}
+.btn.green:hover{background:#0F6E56;}
+.btn.gs{width:auto;padding:7px 14px;}
+.btn.blue{border-color:#185FA5;color:#185FA5;}
+.btn.blue:hover{background:#eef4fb;}
+.btn.red{border-color:#E24B4A;color:#A32D2D;}
+.btn.red:hover{background:#fff0f0;}
 .btn.sm{padding:4px 10px;font-size:12px;}
-.err{font-size:12px;color:#A32D2D;margin-top:8px;min-height:16px;}
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:12px;}
+.err{font-size:12px;color:#A32D2D;min-height:18px;margin-bottom:4px;}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:12px;}
 .logo{font-size:20px;font-weight:500;}
 .logo span{color:#1D9E75;}
-.user-pill{display:flex;align-items:center;gap:8px;font-size:13px;color:#666;}
-.role-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;}
-.role-badge.manager{background:#E1F5EE;color:#0F6E56;}
-.role-badge.staff{background:#E6F1FB;color:#185FA5;}
+.upill{display:flex;align-items:center;gap:8px;font-size:13px;color:#666;}
+.rbadge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;}
+.rbadge.manager{background:#E1F5EE;color:#0F6E56;}
+.rbadge.staff{background:#E6F1FB;color:#185FA5;}
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.25rem;}
-@media(max-width:600px){.metrics{grid-template-columns:1fr 1fr;}.form-grid,.form-grid-3{grid-template-columns:1fr;}}
+@media(max-width:600px){.metrics{grid-template-columns:1fr 1fr;}}
 .metric{background:#fff;border-radius:8px;padding:0.85rem 1rem;border:1px solid #e8e8e4;}
-.metric-label{font-size:12px;color:#888;margin-bottom:4px;}
-.metric-value{font-size:20px;font-weight:500;}
-.metric-value.teal{color:#1D9E75;}
-.metric-value.amber{color:#BA7517;}
-.metric-value.red{color:#E24B4A;}
-.reminders-bar{background:#FAEEDA;border:1px solid #FAC775;border-radius:8px;padding:10px 14px;margin-bottom:1.25rem;font-size:13px;color:#633806;display:none;}
-.reminders-bar.show{display:block;}
-.reminder-item{margin-top:4px;display:flex;align-items:center;gap:6px;}
-.rdot{width:6px;height:6px;border-radius:50%;background:#BA7517;flex-shrink:0;}
-.rdot.overdue{background:#E24B4A;}
-.currency-bar{display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;padding:10px 14px;background:#fff;border:1px solid #e8e8e4;border-radius:8px;flex-wrap:wrap;}
-.currency-bar label{font-size:13px;color:#666;}
-.currency-bar select{font-size:13px;padding:5px 8px;border:1px solid #e0e0db;border-radius:8px;background:#fff;color:#1a1a1a;}
-.controls{display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap;}
-.controls input,.controls select{flex:1;min-width:130px;font-size:14px;padding:7px 10px;border:1px solid #e0e0db;border-radius:8px;background:#fff;color:#1a1a1a;}
-.sync-bar{display:flex;align-items:center;gap:8px;font-size:12px;color:#888;margin-bottom:1rem;}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:#1D9E75;flex-shrink:0;}
-.sync-dot.syncing{background:#BA7517;}
-.sync-dot.error{background:#E24B4A;}
-.tab-actions{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:10px;}
-.table-wrap{background:#fff;border:1px solid #e8e8e4;border-radius:12px;overflow:hidden;}
-.table-container{overflow-x:auto;}
+.mlbl{font-size:12px;color:#888;margin-bottom:4px;}
+.mval{font-size:20px;font-weight:500;}
+.mval.g{color:#1D9E75;}.mval.a{color:#BA7517;}.mval.r{color:#E24B4A;}
+.rbar{background:#FAEEDA;border:1px solid #FAC775;border-radius:8px;padding:10px 14px;margin-bottom:1.25rem;font-size:13px;color:#633806;display:none;}
+.rbar.on{display:block;}
+.ritem{margin-top:4px;display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:#BA7517;flex-shrink:0;}
+.dot.r{background:#E24B4A;}
+.cbar{display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;padding:10px 14px;background:#fff;border:1px solid #e8e8e4;border-radius:8px;flex-wrap:wrap;}
+.cbar label{font-size:13px;color:#666;margin:0;width:auto;}
+.cbar select{margin:0;width:auto;font-size:13px;padding:5px 8px;}
+.filters{display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap;}
+.filters input,.filters select{flex:1;min-width:130px;margin:0;}
+.tabbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:10px;}
+.syncbar{display:flex;align-items:center;gap:8px;font-size:12px;color:#888;}
+.sdot{width:7px;height:7px;border-radius:50%;background:#1D9E75;flex-shrink:0;}
+.sdot.s{background:#BA7517;}.sdot.e{background:#E24B4A;}
+.tabs{display:flex;gap:0;border-bottom:1px solid #e8e8e4;margin-bottom:1.25rem;}
+.tab{padding:9px 16px;font-size:13px;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.tab.on{color:#1D9E75;border-bottom-color:#1D9E75;font-weight:500;}
+.card{background:#fff;border:1px solid #e8e8e4;border-radius:12px;overflow:hidden;}
+.tscroll{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
 thead tr{border-bottom:1px solid #e8e8e4;}
 th{text-align:left;padding:9px 10px;font-size:12px;font-weight:500;color:#888;cursor:pointer;user-select:none;white-space:nowrap;background:#fafaf8;}
 th:hover{color:#1a1a1a;}
-td{padding:10px;border-bottom:1px solid #f0f0ec;color:#1a1a1a;vertical-align:middle;}
+td{padding:10px;border-bottom:1px solid #f0f0ec;vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:#fafaf8;}
-tr.overdue-row td{background:#fff8f8;}
-tr.due-soon-row td{background:#fffbf4;}
+tr.ov td{background:#fff8f8;}
+tr.ds td{background:#fffbf4;}
 .badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap;}
 .badge.confirmed{background:#E1F5EE;color:#0F6E56;}
 .badge.pending{background:#FAEEDA;color:#854F0B;}
@@ -79,77 +79,80 @@ tr.due-soon-row td{background:#fffbf4;}
 .badge.paid{background:#EAF3DE;color:#3B6D11;}
 .badge.unpaid{background:#FCEBEB;color:#A32D2D;}
 .badge.partial{background:#FAEEDA;color:#854F0B;}
-.curr-badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;background:#f0f0ec;color:#888;margin-left:3px;}
-.due-tag{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:500;}
-.due-tag.overdue{background:#FCEBEB;color:#A32D2D;}
-.due-tag.due-soon{background:#FAEEDA;color:#854F0B;}
-.due-tag.ok{background:#EAF3DE;color:#3B6D11;}
-.due-tag.none{background:#f0f0ec;color:#888;}
+.cbadge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;background:#f0f0ec;color:#888;margin-left:3px;}
+.dtag{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:500;}
+.dtag.ov{background:#FCEBEB;color:#A32D2D;}
+.dtag.ds{background:#FAEEDA;color:#854F0B;}
+.dtag.ok{background:#EAF3DE;color:#3B6D11;}
+.dtag.no{background:#f0f0ec;color:#888;}
 .empty{text-align:center;padding:2.5rem;color:#888;font-size:14px;}
-.tabs{display:flex;gap:2px;border-bottom:1px solid #e8e8e4;margin-bottom:1.25rem;}
-.tab{padding:9px 16px;font-size:13px;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;}
-.tab.active{color:#1D9E75;border-bottom-color:#1D9E75;font-weight:500;}
-.users-table{width:100%;font-size:13px;border-collapse:collapse;}
-.users-table td,.users-table th{padding:9px 10px;border-bottom:1px solid #f0f0ec;text-align:left;}
-.users-table th{font-size:12px;color:#888;font-weight:500;background:#fafaf8;}
-.users-table tr:last-child td{border-bottom:none;}
-.section-label{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin:1rem 0 8px;}
-.converted{font-size:11px;color:#888;margin-top:3px;}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto;}
-.modal-overlay.open{display:flex;}
+.slabel{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin:1rem 0 6px;}
+.hint{font-size:11px;color:#888;margin-top:2px;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto;}
+.overlay.on{display:flex;}
 .modal{background:#fff;border-radius:12px;border:1px solid #e0e0db;padding:1.5rem;width:100%;max-width:500px;margin-bottom:40px;}
 .modal h3{font-size:16px;font-weight:500;margin-bottom:1rem;}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;}
-.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:center;justify-content:center;}
-.confirm-overlay.open{display:flex;}
-.confirm-box{background:#fff;border-radius:12px;border:1px solid #e0e0db;padding:1.5rem;width:100%;max-width:340px;margin:1rem;}
-.confirm-box p{font-size:14px;margin-bottom:1.25rem;line-height:1.5;}
-.spinner{display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;}
-@keyframes spin{to{transform:rotate(360deg);}}
+.mfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;}
+.conf-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:center;justify-content:center;}
+.conf-overlay.on{display:flex;}
+.conf{background:#fff;border-radius:12px;border:1px solid #e0e0db;padding:1.5rem;width:100%;max-width:340px;margin:1rem;}
+.conf p{font-size:14px;margin-bottom:1.25rem;line-height:1.5;}
+.exp-row{display:grid;grid-template-columns:1fr 140px 80px auto;gap:8px;align-items:center;margin-bottom:8px;}
+@media(max-width:520px){.exp-row{grid-template-columns:1fr 1fr;gap:6px;}}
+.exp-sum{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:1rem 0;}
+.exp-card{background:#f5f5f3;border-radius:8px;padding:0.75rem 1rem;text-align:center;}
+.exp-card .el{font-size:11px;color:#888;margin-bottom:3px;}
+.exp-card .ev{font-size:16px;font-weight:500;}
+.ev.g{color:#1D9E75;}.ev.r{color:#E24B4A;}.ev.a{color:#BA7517;}
+.profit-bar{height:8px;border-radius:4px;background:#f0f0ec;margin:8px 0;overflow:hidden;}
+.profit-fill{height:100%;border-radius:4px;background:#1D9E75;transition:width 0.3s;}
+.profit-fill.neg{background:#E24B4A;}
 </style>
 </head>
 <body>
-<div class="app">
+<div class="wrap">
 
-<div id="loginView">
-  <div class="login-wrap">
+<div id="vLogin">
+  <div class="login-box">
     <h2><span style="color:#1D9E75">Yadawee</span> - order manager</h2>
     <p>Sign in with your team credentials</p>
-    <div class="form-row"><label>Username</label><input type="text" id="loginUser" placeholder="e.g. manager" autocomplete="username"/></div>
-    <div class="form-row"><label>Password</label><input type="password" id="loginPass" placeholder="......" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <label>Username</label>
+    <input type="text" id="iUser" placeholder="e.g. manager" autocomplete="username"/>
+    <label>Password</label>
+    <input type="password" id="iPass" placeholder="......" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"/>
     <div class="err" id="loginErr"></div>
-    <div style="margin-top:14px;"><button class="btn primary" id="loginBtn" onclick="doLogin()">Sign in</button></div>
+    <button class="btn green" id="loginBtn" onclick="login()">Sign in</button>
   </div>
 </div>
 
-<div id="mainView" style="display:none;">
-  <div class="header">
+<div id="vMain" style="display:none">
+  <div class="hdr">
     <div class="logo"><span>Yadawee</span> - order manager</div>
-    <div class="user-pill">
-      <span id="userLabel"></span>
-      <span class="role-badge" id="roleBadge"></span>
-      <button class="btn sm" onclick="doLogout()">Sign out</button>
+    <div class="upill">
+      <span id="uLabel"></span>
+      <span class="rbadge" id="uRole"></span>
+      <button class="btn sm" onclick="logout()">Sign out</button>
     </div>
   </div>
 
   <div class="tabs">
-    <div class="tab active" id="tabOrders" onclick="showTab('orders')">Orders</div>
-    <div class="tab" id="tabTeam" onclick="showTab('team')" style="display:none;">Team</div>
+    <div class="tab on" id="tOrders" onclick="showTab('orders')">Orders</div>
+    <div class="tab" id="tTeam" onclick="showTab('team')" style="display:none">Team</div>
   </div>
 
-  <div id="ordersTab">
-    <div class="tab-actions">
-      <div class="sync-bar"><span class="sync-dot" id="syncDot"></span><span id="syncLabel">Synced - all devices share same data</span></div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn export" onclick="exportCSV()">Export CSV</button>
-        <button class="btn primary slim" onclick="openModal()">+ new order</button>
+  <div id="vOrders">
+    <div class="tabbar">
+      <div class="syncbar"><span class="sdot" id="sdot"></span><span id="slbl">Loading...</span></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn blue" onclick="exportCSV()">Export CSV</button>
+        <button class="btn green gs" onclick="openOrder()">+ new order</button>
       </div>
     </div>
     <div class="metrics" id="metrics"></div>
-    <div class="reminders-bar" id="remindersBar"></div>
-    <div class="currency-bar">
+    <div class="rbar" id="rbar"></div>
+    <div class="cbar">
       <label>Display currency:</label>
-      <select id="displayCurrency" onchange="render()">
+      <select id="dCurr" onchange="render()">
         <option value="EGP">EGP - Egyptian Pound</option>
         <option value="USD">USD - US Dollar</option>
         <option value="EUR">EUR - Euro</option>
@@ -158,415 +161,432 @@ tr.due-soon-row td{background:#fffbf4;}
         <option value="AED">AED - UAE Dirham</option>
       </select>
     </div>
-    <div class="controls">
-      <input type="text" id="search" placeholder="Search client or order ID..." oninput="render()"/>
-      <select id="filterDelivery" onchange="render()">
+    <div class="filters">
+      <input type="text" id="fSearch" placeholder="Search client or ID..." oninput="render()"/>
+      <select id="fDel" onchange="render()">
         <option value="">All delivery statuses</option>
-        <option value="Pending">Pending</option>
-        <option value="Confirmed">Confirmed</option>
-        <option value="Shipped">Shipped</option>
-        <option value="Delivered">Delivered</option>
-        <option value="Cancelled">Cancelled</option>
+        <option>Pending</option><option>Confirmed</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option>
       </select>
-      <select id="filterPayment" onchange="render()">
+      <select id="fPay" onchange="render()">
         <option value="">All payment statuses</option>
-        <option value="Paid">Paid</option>
-        <option value="Unpaid">Unpaid</option>
-        <option value="Partial">Partial</option>
+        <option>Paid</option><option>Unpaid</option><option>Partial</option>
       </select>
-      <select id="filterDue" onchange="render()">
+      <select id="fDue" onchange="render()">
         <option value="">All due dates</option>
         <option value="overdue">Overdue</option>
-        <option value="due-soon">Due within 7 days</option>
+        <option value="soon">Due within 7 days</option>
       </select>
     </div>
-    <div class="table-wrap">
-      <div class="table-container">
-        <table>
-          <thead><tr>
-            <th onclick="sort('id')">Order ID</th>
-            <th onclick="sort('date')">Date</th>
-            <th onclick="sort('client')">Client</th>
-            <th>Products</th>
-            <th onclick="sort('totalEGP')">Amount</th>
-            <th onclick="sort('payment')">Payment</th>
-            <th onclick="sort('delivery')">Delivery</th>
-            <th onclick="sort('dueDate')">Due / follow-up</th>
-            <th>Notes</th>
-            <th>By</th>
-            <th></th>
-          </tr></thead>
-          <tbody id="tbody"><tr><td colspan="11" style="text-align:center;padding:2rem;color:#888;">Loading...</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <div id="teamTab" style="display:none;">
-    <div class="tab-actions">
-      <span style="font-size:14px;color:#888;">Manage team members and roles</span>
-      <button class="btn primary slim" onclick="openAddUser()">+ add member</button>
-    </div>
-    <div class="table-wrap">
-      <table class="users-table">
-        <thead><tr><th>Username</th><th>Role</th><th>Orders added</th><th></th></tr></thead>
-        <tbody id="usersTbody"></tbody>
+    <div class="card"><div class="tscroll">
+      <table>
+        <thead><tr>
+          <th onclick="srt('id')">ID</th>
+          <th onclick="srt('date')">Date</th>
+          <th onclick="srt('client')">Client</th>
+          <th>Products</th>
+          <th onclick="srt('egp')">Amount</th>
+          <th onclick="srt('payment')">Payment</th>
+          <th onclick="srt('delivery')">Delivery</th>
+          <th onclick="srt('dueDate')">Due / follow-up</th>
+          <th>Notes</th>
+          <th>By</th>
+          <th></th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
       </table>
+    </div></div>
+  </div>
+
+  <div id="vTeam" style="display:none">
+    <div class="tabbar">
+      <span style="font-size:14px;color:#888">Manage team members</span>
+      <button class="btn green gs" onclick="openUser()">+ add member</button>
     </div>
+    <div class="card"><div class="tscroll">
+      <table>
+        <thead><tr><th>Username</th><th>Role</th><th>Orders added</th><th></th></tr></thead>
+        <tbody id="utbody"></tbody>
+      </table>
+    </div></div>
   </div>
 </div>
 
-<div class="modal-overlay" id="orderModal">
+<div class="overlay" id="oOrder">
 <div class="modal">
-  <h3 id="modalTitle">New order</h3>
-  <div class="section-label">Order details</div>
-  <div class="form-grid">
-    <div class="form-row"><label>Client / retailer name</label><input type="text" id="fClient" placeholder="e.g. Noon Egypt"/></div>
-    <div class="form-row"><label>Order date</label><input type="date" id="fDate"/></div>
+  <h3 id="oTitle">New order</h3>
+  <div class="slabel">Order details</div>
+  <div class="g2">
+    <div><label>Client name</label><input type="text" id="oClient" placeholder="e.g. Noon Egypt"/></div>
+    <div><label>Order date</label><input type="date" id="oDate"/></div>
   </div>
-  <div class="form-row"><label>Products and quantities</label><input type="text" id="fProducts" placeholder="e.g. Woven basket x10"/></div>
-  <div class="form-grid-3">
-    <div class="form-row"><label>Total amount</label><input type="number" id="fTotal" placeholder="0" oninput="updateConversion()"/><div class="converted" id="convHint"></div></div>
-    <div class="form-row"><label>Currency</label><select id="fCurrency" onchange="updateConversion()"><option>EGP</option><option>USD</option><option>EUR</option><option>SAR</option><option>GBP</option><option>AED</option></select></div>
+  <label>Products and quantities</label>
+  <input type="text" id="oProducts" placeholder="e.g. Woven basket x10, Tote x5"/>
+  <div class="g21">
+    <div><label>Total amount</label><input type="number" id="oTotal" placeholder="0" oninput="convHint()"/><div class="hint" id="oHint"></div></div>
+    <div><label>Currency</label><select id="oCurr" onchange="convHint()"><option>EGP</option><option>USD</option><option>EUR</option><option>SAR</option><option>GBP</option><option>AED</option></select></div>
   </div>
-  <div class="form-grid">
-    <div class="form-row"><label>Payment status</label><select id="fPayment"><option>Unpaid</option><option>Partial</option><option>Paid</option></select></div>
-    <div class="form-row"><label>Delivery status</label><select id="fDelivery"><option>Pending</option><option>Confirmed</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option></select></div>
+  <div class="g2">
+    <div><label>Payment</label><select id="oPay"><option>Unpaid</option><option>Partial</option><option>Paid</option></select></div>
+    <div><label>Delivery</label><select id="oDel"><option>Pending</option><option>Confirmed</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option></select></div>
   </div>
-  <div class="section-label">Follow-up and reminders</div>
-  <div class="form-grid">
-    <div class="form-row"><label>Payment due date</label><input type="date" id="fDueDate"/></div>
-    <div class="form-row"><label>Follow-up reminder</label><input type="date" id="fFollowUp"/></div>
+  <div class="slabel">Follow-up and reminders</div>
+  <div class="g2">
+    <div><label>Payment due date</label><input type="date" id="oDue"/></div>
+    <div><label>Follow-up reminder</label><input type="date" id="oFollowUp"/></div>
   </div>
-  <div class="form-row"><label>Notes</label><textarea id="fNotes" placeholder="Any notes for the team..."></textarea></div>
-  <div class="modal-actions">
-    <button class="btn danger" id="btnDeleteOrder" style="margin-right:auto;display:none;" onclick="confirmDelete()">Delete</button>
-    <button class="btn" onclick="closeModal()">Cancel</button>
-    <button class="btn primary slim" onclick="saveOrder()">Save order</button>
+  <label>Notes</label>
+  <textarea id="oNotes" placeholder="Any notes for the team..."></textarea>
+  <div class="mfoot">
+    <button class="btn red sm" id="oDel2" style="margin-right:auto;display:none" onclick="askDelete()">Delete</button>
+    <button class="btn" onclick="closeOrder()">Cancel</button>
+    <button class="btn green gs" onclick="saveOrder()">Save order</button>
   </div>
 </div>
 </div>
 
-<div class="modal-overlay" id="userModal">
-<div class="modal" style="max-width:360px;">
+<div class="overlay" id="oUser">
+<div class="modal" style="max-width:360px">
   <h3>Add team member</h3>
-  <div class="form-row"><label>Username</label><input type="text" id="fUsername" placeholder="e.g. layla"/></div>
-  <div class="form-row"><label>Password</label><input type="text" id="fUserPass" placeholder="Set a password"/></div>
-  <div class="form-row"><label>Role</label><select id="fRole"><option value="staff">Staff</option><option value="manager">Manager</option></select></div>
-  <div class="err" id="userErr"></div>
-  <div class="modal-actions">
-    <button class="btn" onclick="closeUserModal()">Cancel</button>
-    <button class="btn primary slim" onclick="saveUser()">Add member</button>
+  <label>Username</label><input type="text" id="uName" placeholder="e.g. layla"/>
+  <label>Password</label><input type="text" id="uPass" placeholder="Set a password"/>
+  <label>Role</label><select id="uRole2"><option value="staff">Staff</option><option value="manager">Manager</option></select>
+  <div class="err" id="uErr"></div>
+  <div class="mfoot">
+    <button class="btn" onclick="closeUser()">Cancel</button>
+    <button class="btn green gs" onclick="saveUser()">Add member</button>
   </div>
 </div>
 </div>
 
-<div class="confirm-overlay" id="confirmOverlay">
-<div class="confirm-box">
+<div class="conf-overlay" id="oConf">
+<div class="conf">
   <p>Delete this order? This cannot be undone.</p>
-  <div style="display:flex;gap:8px;justify-content:flex-end;">
-    <button class="btn" onclick="closeConfirm()">Cancel</button>
-    <button class="btn danger" onclick="doDelete()">Delete</button>
+  <div style="display:flex;gap:8px;justify-content:flex-end">
+    <button class="btn" onclick="closeConf()">Cancel</button>
+    <button class="btn red" onclick="doDelete()">Delete</button>
+  </div>
+</div>
+</div>
+
+<div class="overlay" id="oExp">
+<div class="modal" style="max-width:640px">
+  <h3 id="expTitle">Expenses</h3>
+  <div class="exp-sum" id="expSum"></div>
+  <div class="slabel">Expense items</div>
+  <div id="expRows"></div>
+  <button class="btn gs" style="margin-top:8px;border-style:dashed" onclick="addExpRow()">+ add expense</button>
+  <div class="mfoot">
+    <button class="btn" onclick="closeExp()">Close</button>
+    <button class="btn green gs" onclick="saveExp()">Save expenses</button>
   </div>
 </div>
 </div>
 
 <script>
-const SYMBOLS={EGP:'EGP',USD:'$',EUR:'EUR',SAR:'SAR',GBP:'GBP',AED:'AED'};
-const rates={EGP:1,USD:0.020,EUR:0.019,SAR:0.076,GBP:0.016,AED:0.074};
-function toEGP(a,c){return a/rates[c];}
-function fromEGP(e,c){return e*rates[c];}
-function fmt(v,c){return SYMBOLS[c]+' '+Math.round(v).toLocaleString();}
+const R={EGP:1,USD:0.020,EUR:0.019,SAR:0.076,GBP:0.016,AED:0.074};
+const SYM={EGP:'EGP',USD:'$',EUR:'EUR',SAR:'SAR',GBP:'GBP',AED:'AED'};
+const f=(v,c)=>SYM[c]+' '+Math.round(v).toLocaleString();
+const toE=(a,c)=>a/R[c];
+const frE=(e,c)=>e*R[c];
 
-// --- JSONBin storage (free, no signup needed for reading) ---
-// We use a public JSONBin bin as shared storage.
-// BIN_ID will be set on first run and stored in localStorage as fallback reference.
-const BIN_SECRET = 'yadawee2026';
-const API_BASE = 'https://api.jsonbin.io/v3';
-// Public API key for jsonbin (read/write with master key)
-// Using a simple approach: store data in a GitHub Gist or use localStorage with cross-tab sync
-// Since external APIs may be blocked, use BroadcastChannel for same-origin sync + localStorage
+let cur=null,orders=[],users=[],editId=null,delId=null,sk='date',sd=-1,ctr=10;
+const nid=()=>'YDW-'+(ctr++).toString().padStart(3,'0');
 
-let currentUser=null, orders=[], users=[], editId=null, deleteId=null;
-let sortKey='date', sortDir=-1, counter=10;
+async function api(action,body){
+  const opt=body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{};
+  const r=await fetch('/api/data?action='+action,opt);
+  return r.json();
+}
 
-const DEFAULT_USERS=[
-  {username:'manager',password:'yadawee123',role:'manager'},
-  {username:'sara',password:'staff123',role:'staff'},
-  {username:'ahmed',password:'staff123',role:'staff'},
-];
-const DEFAULT_ORDERS=[
-  {id:'YDW-001',date:'2026-03-01',client:'Noon Egypt',products:'Woven basket x20, Tote bag x15',total:12400,currency:'EGP',payment:'Paid',delivery:'Delivered',dueDate:'2026-03-15',followUp:'',notes:'Repeat client.',addedBy:'manager'},
-  {id:'YDW-002',date:'2026-03-10',client:'Cairo Bazaar Co.',products:'Ceramic mug x30',total:380,currency:'USD',payment:'Partial',delivery:'Shipped',dueDate:'2026-03-28',followUp:'',notes:'50% paid.',addedBy:'sara'},
-  {id:'YDW-003',date:'2026-03-18',client:'Heritage Gifts LLC',products:'Embroidered pouch x50',total:9800,currency:'EGP',payment:'Unpaid',delivery:'Confirmed',dueDate:'2026-04-05',followUp:'2026-04-01',notes:'New client.',addedBy:'ahmed'},
-  {id:'YDW-004',date:'2026-03-22',client:'Souk Direct',products:'Palm leaf mat x10',total:850,currency:'SAR',payment:'Paid',delivery:'Delivered',dueDate:'2026-03-25',followUp:'',notes:'',addedBy:'manager'},
-  {id:'YDW-005',date:'2026-03-27',client:'Artisan Hub',products:'Macrame wall art x8',total:420,currency:'EUR',payment:'Unpaid',delivery:'Pending',dueDate:'2026-04-10',followUp:'2026-04-03',notes:'Waiting for address.',addedBy:'sara'},
-];
-
-// Use localStorage with storage events for cross-tab sync on same browser
-// Plus BroadcastChannel for same-origin real-time sync
-const bc = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('yadawee_sync') : null;
-if(bc) bc.onmessage = (e) => {
-  if(e.data.type==='orders') orders=e.data.data;
-  if(e.data.type==='users') users=e.data.data;
-  if(currentUser) render();
-};
-
-function loadData(){
+async function login(){
+  const u=document.getElementById('iUser').value.trim().toLowerCase();
+  const p=document.getElementById('iPass').value;
+  const btn=document.getElementById('loginBtn');
+  btn.textContent='Signing in...';btn.disabled=true;
   try{
-    const u=localStorage.getItem('yadawee_users');
-    const o=localStorage.getItem('yadawee_orders');
-    users=u?JSON.parse(u):DEFAULT_USERS;
-    orders=o?JSON.parse(o):DEFAULT_ORDERS;
-    if(!u) localStorage.setItem('yadawee_users',JSON.stringify(DEFAULT_USERS));
-    if(!o) localStorage.setItem('yadawee_orders',JSON.stringify(DEFAULT_ORDERS));
-  }catch{users=DEFAULT_USERS;orders=DEFAULT_ORDERS;}
-  counter=orders.reduce((m,o)=>{const n=parseInt(o.id.replace(/\D/g,''));return n>m?n:m;},9)+1;
-}
-function saveUsers(){
-  localStorage.setItem('yadawee_users',JSON.stringify(users));
-  if(bc) bc.postMessage({type:'users',data:users});
-}
-function saveOrders(){
-  localStorage.setItem('yadawee_orders',JSON.stringify(orders));
-  if(bc) bc.postMessage({type:'orders',data:orders});
+    const d=await api('load');
+    users=d.users;orders=d.orders;
+    ctr=orders.reduce((m,o)=>{const n=parseInt(o.id.replace(/\D/g,''));return n>m?n:m;},9)+1;
+    const found=users.find(x=>x.username===u&&x.password===p);
+    if(!found){document.getElementById('loginErr').textContent='Incorrect username or password.';btn.textContent='Sign in';btn.disabled=false;return;}
+    cur=found;
+    document.getElementById('vLogin').style.display='none';
+    document.getElementById('vMain').style.display='block';
+    document.getElementById('uLabel').textContent=cur.username;
+    const rb=document.getElementById('uRole');rb.textContent=cur.role;rb.className='rbadge '+cur.role;
+    if(cur.role==='manager')document.getElementById('tTeam').style.display='';
+    sync('ok');render();
+  }catch(e){document.getElementById('loginErr').textContent='Connection error. Try again.';btn.textContent='Sign in';btn.disabled=false;}
 }
 
-window.addEventListener('storage',(e)=>{
-  if(e.key==='yadawee_orders'&&e.newValue){orders=JSON.parse(e.newValue);if(currentUser)render();}
-  if(e.key==='yadawee_users'&&e.newValue){users=JSON.parse(e.newValue);if(currentUser)render();}
-});
+function logout(){cur=null;document.getElementById('vMain').style.display='none';document.getElementById('vLogin').style.display='block';document.getElementById('iUser').value='';document.getElementById('iPass').value='';document.getElementById('loginErr').textContent='';document.getElementById('loginBtn').textContent='Sign in';document.getElementById('loginBtn').disabled=false;document.getElementById('tTeam').style.display='none';}
 
-function nextId(){return 'YDW-'+(counter++).toString().padStart(3,'0');}
+function sync(s){const d=document.getElementById('sdot'),l=document.getElementById('slbl');d.className='sdot'+(s==='s'?' s':s==='e'?' e':'');l.textContent=s==='s'?'Saving...':s==='e'?'Error saving - data may not be synced':'Synced - works on all devices';}
 
-function doLogin(){
-  const u=document.getElementById('loginUser').value.trim().toLowerCase();
-  const p=document.getElementById('loginPass').value;
-  loadData();
-  const found=users.find(x=>x.username===u&&x.password===p);
-  if(!found){document.getElementById('loginErr').textContent='Incorrect username or password.';return;}
-  currentUser=found;
-  document.getElementById('loginView').style.display='none';
-  document.getElementById('mainView').style.display='block';
-  document.getElementById('userLabel').textContent=currentUser.username;
-  const rb=document.getElementById('roleBadge');
-  rb.textContent=currentUser.role;
-  rb.className='role-badge '+(currentUser.role==='manager'?'manager':'staff');
-  if(currentUser.role==='manager') document.getElementById('tabTeam').style.display='';
-  setSyncStatus('ok');render();
-}
-function doLogout(){
-  currentUser=null;
-  document.getElementById('mainView').style.display='none';
-  document.getElementById('loginView').style.display='block';
-  document.getElementById('loginUser').value='';
-  document.getElementById('loginPass').value='';
-  document.getElementById('loginErr').textContent='';
-  document.getElementById('tabTeam').style.display='none';
-}
-function setSyncStatus(s){
-  const dot=document.getElementById('syncDot');
-  const lbl=document.getElementById('syncLabel');
-  dot.className='sync-dot'+(s==='syncing'?' syncing':s==='error'?' error':'');
-  lbl.textContent=s==='syncing'?'Saving...':s==='error'?'Save error':'Synced - all devices share same data';
-}
-function sort(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=-1;}render();}
-function getEGP(o){return toEGP(o.total,o.currency);}
+function showTab(t){document.getElementById('vOrders').style.display=t==='orders'?'':'none';document.getElementById('vTeam').style.display=t==='team'?'':'none';document.getElementById('tOrders').className='tab'+(t==='orders'?' on':'');document.getElementById('tTeam').className='tab'+(t==='team'?' on':'');}
+
+function srt(k){if(sk===k)sd*=-1;else{sk=k;sd=-1;}render();}
+const egp=o=>toE(o.total,o.currency);
 
 const today=new Date();today.setHours(0,0,0,0);
-function daysFrom(s){if(!s)return null;const d=new Date(s);d.setHours(0,0,0,0);return Math.round((d-today)/86400000);}
-function dueBadge(due,pay){
+const df=s=>{if(!s)return null;const d=new Date(s);d.setHours(0,0,0,0);return Math.round((d-today)/86400000);};
+
+function dueTag(due,pay){
   if(pay==='Paid')return '';
-  const d=daysFrom(due);
-  if(d===null)return '<span class="due-tag none">-</span>';
-  if(d<0)return `<span class="due-tag overdue">Overdue ${Math.abs(d)}d</span>`;
-  if(d<=7)return `<span class="due-tag due-soon">Due in ${d}d</span>`;
-  return `<span class="due-tag ok">${due}</span>`;
+  const d=df(due);
+  if(d===null)return '<span class="dtag no">-</span>';
+  if(d<0)return `<span class="dtag ov">Overdue ${Math.abs(d)}d</span>`;
+  if(d<=7)return `<span class="dtag ds">Due in ${d}d</span>`;
+  return `<span class="dtag ok">${due}</span>`;
 }
 function fuTag(f){
-  if(!f)return '<span style="color:#aaa;font-size:12px;">-</span>';
-  const d=daysFrom(f);
-  if(d<0)return `<span class="due-tag overdue">Was ${f}</span>`;
-  if(d===0)return `<span class="due-tag due-soon">Today</span>`;
-  if(d<=3)return `<span class="due-tag due-soon">In ${d}d</span>`;
-  return `<span style="font-size:12px;color:#888;">${f}</span>`;
+  if(!f)return '<span style="color:#aaa;font-size:12px">-</span>';
+  const d=df(f);
+  if(d<0)return `<span class="dtag ov">Was ${f}</span>`;
+  if(d===0)return `<span class="dtag ds">Today</span>`;
+  if(d<=3)return `<span class="dtag ds">In ${d}d</span>`;
+  return `<span style="font-size:12px;color:#888">${f}</span>`;
 }
-const dMap={Confirmed:'confirmed',Pending:'pending',Shipped:'shipped',Delivered:'delivered',Cancelled:'cancelled'};
-const pMap={Paid:'paid',Unpaid:'unpaid',Partial:'partial'};
+const DM={Confirmed:'confirmed',Pending:'pending',Shipped:'shipped',Delivered:'delivered',Cancelled:'cancelled'};
+const PM={Paid:'paid',Unpaid:'unpaid',Partial:'partial'};
 
 function render(){
-  if(!currentUser)return;
-  const disp=document.getElementById('displayCurrency').value;
-  const q=document.getElementById('search').value.toLowerCase();
-  const fd=document.getElementById('filterDelivery').value;
-  const fp=document.getElementById('filterPayment').value;
-  const fdue=document.getElementById('filterDue').value;
+  if(!cur)return;
+  const dc=document.getElementById('dCurr').value;
+  const q=document.getElementById('fSearch').value.toLowerCase();
+  const fd=document.getElementById('fDel').value;
+  const fp=document.getElementById('fPay').value;
+  const fdu=document.getElementById('fDue').value;
   let rows=orders.filter(o=>{
     if(q&&!o.client.toLowerCase().includes(q)&&!o.id.toLowerCase().includes(q))return false;
     if(fd&&o.delivery!==fd)return false;
     if(fp&&o.payment!==fp)return false;
-    if(fdue){const d=daysFrom(o.dueDate);if(fdue==='overdue'&&(d===null||d>=0))return false;if(fdue==='due-soon'&&(d===null||d<0||d>7))return false;}
+    if(fdu){const d=df(o.dueDate);if(fdu==='overdue'&&(d===null||d>=0))return false;if(fdu==='soon'&&(d===null||d<0||d>7))return false;}
     return true;
   });
   rows.sort((a,b)=>{
-    if(sortKey==='totalEGP')return(getEGP(a)-getEGP(b))*sortDir;
-    return String(a[sortKey]||'').localeCompare(String(b[sortKey]||''))*sortDir;
+    if(sk==='egp')return(egp(a)-egp(b))*sd;
+    return String(a[sk]||'').localeCompare(String(b[sk]||''))*sd;
   });
-  const isManager=currentUser.role==='manager';
-  const tbody=document.getElementById('tbody');
-  if(!rows.length){tbody.innerHTML=`<tr><td colspan="11"><div class="empty">No orders found</div></td></tr>`;}
+  const isM=cur.role==='manager';
+  const tb=document.getElementById('tbody');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="11"><div class="empty">No orders found</div></td></tr>';}
   else{
-    tbody.innerHTML=rows.map(o=>{
-      const egp=getEGP(o),dv=fromEGP(egp,disp),showOrig=o.currency!==disp;
-      const d=daysFrom(o.dueDate);
-      const rc=o.payment!=='Paid'&&d!==null&&d<0?'overdue-row':o.payment!=='Paid'&&d!==null&&d<=7?'due-soon-row':'';
-      const canEdit=isManager||(o.addedBy===currentUser.username);
+    tb.innerHTML=rows.map(o=>{
+      const dv=frE(egp(o),dc),so=o.currency!==dc;
+      const d=df(o.dueDate);
+      const rc=o.payment!=='Paid'&&d!==null&&d<0?'ov':o.payment!=='Paid'&&d!==null&&d<=7?'ds':'';
+      const ce=isM||(o.addedBy===cur.username);
       return `<tr class="${rc}">
-        <td style="font-weight:500;font-family:monospace;font-size:12px;">${o.id}</td>
-        <td style="white-space:nowrap;color:#888;">${o.date}</td>
-        <td style="white-space:nowrap;">${o.client}</td>
-        <td style="max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#888;" title="${o.products}">${o.products}</td>
-        <td style="font-weight:500;white-space:nowrap;">${fmt(dv,disp)}${showOrig?`<span class="curr-badge">${fmt(o.total,o.currency)}</span>`:''}</td>
-        <td><span class="badge ${pMap[o.payment]}">${o.payment}</span></td>
-        <td><span class="badge ${dMap[o.delivery]}">${o.delivery}</span></td>
-        <td>${dueBadge(o.dueDate,o.payment)}<br><span style="font-size:11px;color:#aaa;">follow-up: </span>${fuTag(o.followUp)}</td>
-        <td style="max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#888;font-size:12px;" title="${o.notes||''}">${o.notes||'-'}</td>
-        <td style="font-size:12px;color:#aaa;">${o.addedBy||''}</td>
-        <td>${canEdit?`<button class="btn sm" onclick="openModal('${o.id}')">Edit</button>`:''}</td>
+        <td style="font-weight:500;font-family:monospace;font-size:12px">${o.id}</td>
+        <td style="white-space:nowrap;color:#888">${o.date}</td>
+        <td style="white-space:nowrap">${o.client}</td>
+        <td style="max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#888" title="${o.products}">${o.products}</td>
+        <td style="font-weight:500;white-space:nowrap">${f(dv,dc)}${so?`<span class="cbadge">${f(o.total,o.currency)}</span>`:''}</td>
+        <td><span class="badge ${PM[o.payment]}">${o.payment}</span></td>
+        <td><span class="badge ${DM[o.delivery]}">${o.delivery}</span></td>
+        <td>${dueTag(o.dueDate,o.payment)}<br><span style="font-size:11px;color:#aaa">follow-up: </span>${fuTag(o.followUp)}</td>
+        <td style="max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#888;font-size:12px" title="${o.notes||''}">${o.notes||'-'}</td>
+        <td style="font-size:12px;color:#aaa">${o.addedBy||''}</td>
+        <td>${ce?`<button class="btn sm" onclick="openOrder('${o.id}')">Edit</button>`:''} <button class="btn sm blue" onclick="openExp('${o.id}','${o.client}')">Expenses</button></td>
       </tr>`;
     }).join('');
   }
-  const totalEGP=orders.reduce((s,o)=>s+getEGP(o),0);
-  const unpaidEGP=orders.filter(o=>o.payment==='Unpaid').reduce((s,o)=>s+getEGP(o),0);
-  const active=orders.filter(o=>!['Delivered','Cancelled'].includes(o.delivery)).length;
+  const te=orders.reduce((s,o)=>s+egp(o),0);
+  const ue=orders.filter(o=>o.payment==='Unpaid').reduce((s,o)=>s+egp(o),0);
+  const ac=orders.filter(o=>!['Delivered','Cancelled'].includes(o.delivery)).length;
   document.getElementById('metrics').innerHTML=`
-    <div class="metric"><div class="metric-label">Total orders</div><div class="metric-value">${orders.length}</div></div>
-    <div class="metric"><div class="metric-label">Revenue (${disp})</div><div class="metric-value teal">${fmt(fromEGP(totalEGP,disp),disp)}</div></div>
-    <div class="metric"><div class="metric-label">Active orders</div><div class="metric-value amber">${active}</div></div>
-    <div class="metric"><div class="metric-label">Unpaid (${disp})</div><div class="metric-value red">${fmt(fromEGP(unpaidEGP,disp),disp)}</div></div>
+    <div class="metric"><div class="mlbl">Total orders</div><div class="mval">${orders.length}</div></div>
+    <div class="metric"><div class="mlbl">Revenue (${dc})</div><div class="mval g">${f(frE(te,dc),dc)}</div></div>
+    <div class="metric"><div class="mlbl">Active orders</div><div class="mval a">${ac}</div></div>
+    <div class="metric"><div class="mlbl">Unpaid (${dc})</div><div class="mval r">${f(frE(ue,dc),dc)}</div></div>
   `;
-  const bar=document.getElementById('remindersBar');
-  const rem=orders.filter(o=>{const f=daysFrom(o.followUp);return f!==null&&f<=3&&f>=0;});
-  const ov=orders.filter(o=>{const d=daysFrom(o.dueDate);return o.payment!=='Paid'&&d!==null&&d<0;});
-  let html='';
-  if(ov.length)html+=`<strong>Overdue payments (${ov.length}):</strong>`+ov.map(o=>`<div class="reminder-item"><span class="rdot overdue"></span>${o.client} - ${fmt(fromEGP(getEGP(o),disp),disp)} was due ${o.dueDate}</div>`).join('');
-  if(rem.length)html+=`${ov.length?'<br>':''}<strong>Follow-ups due soon (${rem.length}):</strong>`+rem.map(o=>`<div class="reminder-item"><span class="rdot"></span>${o.client} - follow up ${daysFrom(o.followUp)===0?'today':'in '+daysFrom(o.followUp)+'d'}</div>`).join('');
-  if(html){bar.innerHTML=html;bar.classList.add('show');}else{bar.classList.remove('show');}
-  renderUsers();
+  const rb=document.getElementById('rbar');
+  const rm=orders.filter(o=>{const x=df(o.followUp);return x!==null&&x<=3&&x>=0;});
+  const ov=orders.filter(o=>{const x=df(o.dueDate);return o.payment!=='Paid'&&x!==null&&x<0;});
+  let h='';
+  if(ov.length)h+=`<strong>Overdue payments (${ov.length}):</strong>`+ov.map(o=>`<div class="ritem"><span class="dot r"></span>${o.client} - ${f(frE(egp(o),dc),dc)} was due ${o.dueDate}</div>`).join('');
+  if(rm.length)h+=`${ov.length?'<br>':''}<strong>Follow-ups due soon (${rm.length}):</strong>`+rm.map(o=>`<div class="ritem"><span class="dot"></span>${o.client} - ${df(o.followUp)===0?'today':'in '+df(o.followUp)+'d'}</div>`).join('');
+  if(h){rb.innerHTML=h;rb.classList.add('on');}else{rb.classList.remove('on');}
+  renderTeam();
 }
-function renderUsers(){
-  const tb=document.getElementById('usersTbody');if(!tb)return;
+
+function renderTeam(){
+  const tb=document.getElementById('utbody');if(!tb)return;
   tb.innerHTML=users.map(u=>`<tr>
-    <td style="font-weight:500;">${u.username}</td>
-    <td><span class="role-badge ${u.role==='manager'?'manager':'staff'}">${u.role}</span></td>
-    <td style="color:#888;">${orders.filter(o=>o.addedBy===u.username).length}</td>
-    <td>${u.username!=='manager'?`<button class="btn sm danger" onclick="removeUser('${u.username}')">Remove</button>`:''}</td>
+    <td style="font-weight:500">${u.username}</td>
+    <td><span class="rbadge ${u.role}">${u.role}</span></td>
+    <td style="color:#888">${orders.filter(o=>o.addedBy===u.username).length}</td>
+    <td>${u.username!=='manager'?`<button class="btn sm red" onclick="removeUser('${u.username}')">Remove</button>`:''}</td>
   </tr>`).join('');
 }
-function showTab(t){
-  document.getElementById('ordersTab').style.display=t==='orders'?'':'none';
-  document.getElementById('teamTab').style.display=t==='team'?'':'none';
-  document.getElementById('tabOrders').className='tab'+(t==='orders'?' active':'');
-  document.getElementById('tabTeam').className='tab'+(t==='team'?' active':'');
-}
-function openModal(id){
+
+function openOrder(id){
   editId=id||null;
-  document.getElementById('modalTitle').textContent=id?'Edit order':'New order';
-  const del=document.getElementById('btnDeleteOrder');
+  document.getElementById('oTitle').textContent=id?'Edit order':'New order';
   if(id){
     const o=orders.find(x=>x.id===id);
-    document.getElementById('fClient').value=o.client;
-    document.getElementById('fDate').value=o.date;
-    document.getElementById('fProducts').value=o.products;
-    document.getElementById('fTotal').value=o.total;
-    document.getElementById('fCurrency').value=o.currency;
-    document.getElementById('fPayment').value=o.payment;
-    document.getElementById('fDelivery').value=o.delivery;
-    document.getElementById('fDueDate').value=o.dueDate||'';
-    document.getElementById('fFollowUp').value=o.followUp||'';
-    document.getElementById('fNotes').value=o.notes||'';
-    del.style.display=currentUser.role==='manager'?'':'none';
+    document.getElementById('oClient').value=o.client;
+    document.getElementById('oDate').value=o.date;
+    document.getElementById('oProducts').value=o.products;
+    document.getElementById('oTotal').value=o.total;
+    document.getElementById('oCurr').value=o.currency;
+    document.getElementById('oPay').value=o.payment;
+    document.getElementById('oDel').value=o.delivery;
+    document.getElementById('oDue').value=o.dueDate||'';
+    document.getElementById('oFollowUp').value=o.followUp||'';
+    document.getElementById('oNotes').value=o.notes||'';
+    document.getElementById('oDel2').style.display=cur.role==='manager'?'':'none';
   }else{
-    ['fClient','fProducts','fNotes'].forEach(i=>document.getElementById(i).value='');
-    document.getElementById('fDate').value=new Date().toISOString().slice(0,10);
-    document.getElementById('fTotal').value='';
-    document.getElementById('fCurrency').value='EGP';
-    document.getElementById('fPayment').value='Unpaid';
-    document.getElementById('fDelivery').value='Pending';
-    document.getElementById('fDueDate').value='';
-    document.getElementById('fFollowUp').value='';
-    del.style.display='none';
+    ['oClient','oProducts','oNotes'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('oDate').value=new Date().toISOString().slice(0,10);
+    document.getElementById('oTotal').value='';
+    document.getElementById('oCurr').value='EGP';
+    document.getElementById('oPay').value='Unpaid';
+    document.getElementById('oDel').value='Pending';
+    document.getElementById('oDue').value='';
+    document.getElementById('oFollowUp').value='';
+    document.getElementById('oDel2').style.display='none';
   }
-  document.getElementById('convHint').textContent='';
-  document.getElementById('orderModal').classList.add('open');
+  document.getElementById('oHint').textContent='';
+  document.getElementById('oOrder').classList.add('on');
 }
-function closeModal(){document.getElementById('orderModal').classList.remove('open');}
-function saveOrder(){
-  const client=document.getElementById('fClient').value.trim();
-  const date=document.getElementById('fDate').value;
+function closeOrder(){document.getElementById('oOrder').classList.remove('on');}
+
+async function saveOrder(){
+  const client=document.getElementById('oClient').value.trim();
+  const date=document.getElementById('oDate').value;
   if(!client||!date)return;
-  const o={
-    client,date,
-    products:document.getElementById('fProducts').value.trim(),
-    total:parseFloat(document.getElementById('fTotal').value)||0,
-    currency:document.getElementById('fCurrency').value,
-    payment:document.getElementById('fPayment').value,
-    delivery:document.getElementById('fDelivery').value,
-    dueDate:document.getElementById('fDueDate').value,
-    followUp:document.getElementById('fFollowUp').value,
-    notes:document.getElementById('fNotes').value.trim(),
-    addedBy:currentUser.username,
+  const o={client,date,
+    products:document.getElementById('oProducts').value.trim(),
+    total:parseFloat(document.getElementById('oTotal').value)||0,
+    currency:document.getElementById('oCurr').value,
+    payment:document.getElementById('oPay').value,
+    delivery:document.getElementById('oDel').value,
+    dueDate:document.getElementById('oDue').value,
+    followUp:document.getElementById('oFollowUp').value,
+    notes:document.getElementById('oNotes').value.trim(),
+    addedBy:cur.username
   };
   if(editId){const i=orders.findIndex(x=>x.id===editId);o.id=editId;o.addedBy=orders[i].addedBy;orders[i]=o;}
-  else{o.id=nextId();orders.unshift(o);}
-  closeModal();setSyncStatus('syncing');
-  saveOrders();setSyncStatus('ok');render();
+  else{o.id=nid();orders.unshift(o);}
+  closeOrder();sync('s');
+  try{await api('save-orders',{orders});sync('ok');}catch{sync('e');}
+  render();
 }
-function confirmDelete(){deleteId=editId;document.getElementById('confirmOverlay').classList.add('open');}
-function closeConfirm(){document.getElementById('confirmOverlay').classList.remove('open');deleteId=null;}
-function doDelete(){
-  if(!deleteId)return;
-  orders=orders.filter(o=>o.id!==deleteId);
-  closeConfirm();closeModal();saveOrders();setSyncStatus('ok');render();
+
+function askDelete(){delId=editId;document.getElementById('oConf').classList.add('on');}
+function closeConf(){document.getElementById('oConf').classList.remove('on');delId=null;}
+async function doDelete(){
+  if(!delId)return;
+  orders=orders.filter(o=>o.id!==delId);
+  closeConf();closeOrder();sync('s');
+  try{await api('save-orders',{orders});sync('ok');}catch{sync('e');}
+  render();
 }
-function openAddUser(){
-  document.getElementById('fUsername').value='';
-  document.getElementById('fUserPass').value='';
-  document.getElementById('fRole').value='staff';
-  document.getElementById('userErr').textContent='';
-  document.getElementById('userModal').classList.add('open');
-}
-function closeUserModal(){document.getElementById('userModal').classList.remove('open');}
-function saveUser(){
-  const un=document.getElementById('fUsername').value.trim().toLowerCase();
-  const pw=document.getElementById('fUserPass').value.trim();
-  const role=document.getElementById('fRole').value;
-  if(!un||!pw){document.getElementById('userErr').textContent='Username and password required.';return;}
-  if(users.find(u=>u.username===un)){document.getElementById('userErr').textContent='Username already exists.';return;}
+
+function openUser(){document.getElementById('uName').value='';document.getElementById('uPass').value='';document.getElementById('uRole2').value='staff';document.getElementById('uErr').textContent='';document.getElementById('oUser').classList.add('on');}
+function closeUser(){document.getElementById('oUser').classList.remove('on');}
+async function saveUser(){
+  const un=document.getElementById('uName').value.trim().toLowerCase();
+  const pw=document.getElementById('uPass').value.trim();
+  const role=document.getElementById('uRole2').value;
+  if(!un||!pw){document.getElementById('uErr').textContent='Username and password required.';return;}
+  if(users.find(u=>u.username===un)){document.getElementById('uErr').textContent='Username already exists.';return;}
   users.push({username:un,password:pw,role});
-  closeUserModal();saveUsers();render();
+  closeUser();
+  try{await api('save-users',{users});}catch{}
+  render();
 }
-function removeUser(un){
+async function removeUser(un){
   if(un==='manager')return;
   if(!confirm('Remove '+un+' from the team?'))return;
-  users=users.filter(u=>u.username!==un);saveUsers();render();
+  users=users.filter(u=>u.username!==un);
+  try{await api('save-users',{users});}catch{}
+  render();
 }
-function updateConversion(){
-  const a=parseFloat(document.getElementById('fTotal').value)||0;
-  const c=document.getElementById('fCurrency').value;
-  document.getElementById('convHint').textContent=c!=='EGP'&&a?'approx EGP '+Math.round(toEGP(a,c)).toLocaleString():'';
+
+function convHint(){
+  const a=parseFloat(document.getElementById('oTotal').value)||0;
+  const c=document.getElementById('oCurr').value;
+  document.getElementById('oHint').textContent=c!=='EGP'&&a?'approx EGP '+Math.round(toE(a,c)).toLocaleString():'';
 }
-function exportCSV(){
-  const disp=document.getElementById('displayCurrency').value;
-  const headers=['Order ID','Date','Client','Products','Amount (original)','Currency','Amount ('+disp+')','Payment','Delivery','Due Date','Follow-up','Notes','Added By'];
-  const rows=orders.map(o=>[o.id,o.date,o.client,o.products,o.total,o.currency,Math.round(fromEGP(getEGP(o),disp)),o.payment,o.delivery,o.dueDate||'',o.followUp||'',o.notes||'',o.addedBy||''].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
-  const csv=[headers.join(','),...rows].join('\n');
+
+let expOrderId=null, expRows=[];
+const EXP_CATS=['Raw materials','Artisan wages','Packaging','Shipping / transport','Other'];
+
+async function openExp(orderId, client){
+  expOrderId=orderId;
+  document.getElementById('expTitle').textContent='Expenses - '+client+' ('+orderId+')';
+  expRows=await api('load-expenses&orderId='+orderId);
+  if(!Array.isArray(expRows)) expRows=[];
+  renderExpRows();
+  renderExpSum(orderId);
+  document.getElementById('oExp').classList.add('on');
+}
+function closeExp(){document.getElementById('oExp').classList.remove('on');expOrderId=null;expRows=[];}
+
+function renderExpRows(){
+  const o=orders.find(x=>x.id===expOrderId);
+  const rev=o?Math.round(toE(o.total,o.currency)):0;
+  const container=document.getElementById('expRows');
+  if(!expRows.length){container.innerHTML='<div style="color:#aaa;font-size:13px;padding:8px 0">No expenses added yet. Click below to add one.</div>';renderExpSum2(rev);return;}
+  container.innerHTML=expRows.map((r,i)=>`
+    <div class="exp-row">
+      <select onchange="expRows[${i}].cat=this.value;renderExpSum2(${rev})" style="margin:0">${EXP_CATS.map(c=>`<option${r.cat===c?' selected':''}>${c}</option>`).join('')}</select>
+      <input type="text" placeholder="Description" value="${r.desc||''}" oninput="expRows[${i}].desc=this.value" style="margin:0"/>
+      <input type="number" placeholder="EGP" value="${r.amount||''}" oninput="expRows[${i}].amount=parseFloat(this.value)||0;renderExpSum2(${rev})" style="margin:0"/>
+      <button class="btn sm red" onclick="expRows.splice(${i},1);renderExpRows()">x</button>
+    </div>
+  `).join('');
+  renderExpSum2(rev);
+}
+
+function addExpRow(){
+  expRows.push({cat:'Raw materials',desc:'',amount:0});
+  renderExpRows();
+}
+
+function renderExpSum(orderId){
+  const o=orders.find(x=>x.id===orderId);
+  const rev=o?Math.round(toE(o.total,o.currency)):0;
+  renderExpSum2(rev);
+}
+
+function renderExpSum2(rev){
+  const total=expRows.reduce((s,r)=>s+(parseFloat(r.amount)||0),0);
+  const wages=expRows.filter(r=>r.cat==='Artisan wages').reduce((s,r)=>s+(parseFloat(r.amount)||0),0);
+  const profit=rev-total;
+  const margin=rev>0?Math.round((profit/rev)*100):0;
+  const pct=rev>0?Math.min(100,Math.abs(Math.round((profit/rev)*100))):0;
+  document.getElementById('expSum').innerHTML=`
+    <div class="exp-card"><div class="el">Revenue</div><div class="ev g">EGP ${rev.toLocaleString()}</div></div>
+    <div class="exp-card"><div class="el">Total expenses</div><div class="ev r">EGP ${Math.round(total).toLocaleString()}</div></div>
+    <div class="exp-card"><div class="el">Gross profit</div><div class="ev ${profit>=0?'g':'r'}">EGP ${Math.round(profit).toLocaleString()}</div></div>
+    <div style="grid-column:1/-1">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;margin-bottom:4px">
+        <span>Profit margin: <strong style="color:${profit>=0?'#1D9E75':'#E24B4A'}">${margin}%</strong></span>
+        <span>Artisan wages: <strong style="color:#185FA5">EGP ${Math.round(wages).toLocaleString()}</strong> (${total>0?Math.round((wages/total)*100):0}% of costs)</span>
+      </div>
+      <div class="profit-bar"><div class="profit-fill${profit<0?' neg':''}" style="width:${pct}%"></div></div>
+    </div>
+  `;
+}
+
+async function saveExp(){
+  await api('save-expenses',{orderId:expOrderId,expenses:expRows});
+  closeExp();
+}
+
+  const dc=document.getElementById('dCurr').value;
+  const h=['Order ID','Date','Client','Products','Amount (original)','Currency','Amount ('+dc+')','Payment','Delivery','Due Date','Follow-up','Notes','Added By'];
+  const rows=orders.map(o=>[o.id,o.date,o.client,o.products,o.total,o.currency,Math.round(frE(egp(o),dc)),o.payment,o.delivery,o.dueDate||'',o.followUp||'',o.notes||'',o.addedBy||''].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+  const csv=[h.join(','),...rows].join('\n');
   const blob=new Blob([csv],{type:'text/csv'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='yadawee_orders.csv';a.click();
   URL.revokeObjectURL(url);
 }
-loadData();
 </script>
 </body>
 </html>
