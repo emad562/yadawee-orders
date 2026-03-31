@@ -376,7 +376,6 @@ function render(){
       const dv=frE(egp(o),dc),so=o.currency!==dc;
       const d=df(o.dueDate);
       const rc=o.payment!=='Paid'&&d!==null&&d<0?'ov':o.payment!=='Paid'&&d!==null&&d<=7?'ds':'';
-      const ce=isM||(o.addedBy===cur.username);
       return `<tr class="${rc}">
         <td style="font-weight:500;font-family:monospace;font-size:12px">${o.id}</td>
         <td style="white-space:nowrap;color:#888">${o.date}</td>
