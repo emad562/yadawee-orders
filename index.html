@@ -518,7 +518,9 @@ const EXP_CATS=['Raw materials','Artisan wages','Packaging','Shipping / transpor
 async function openExp(orderId, client){
   expOrderId=orderId;
   document.getElementById('expTitle').textContent='Expenses - '+client+' ('+orderId+')';
-  expRows=await api('load-expenses&orderId='+orderId);
+  const expData=await fetch('/api/data?action=load-expenses&orderId='+orderId);
+  expRows=await expData.json();
+  if(!Array.isArray(expRows)) expRows=[];
   if(!Array.isArray(expRows)) expRows=[];
   renderExpRows();
   renderExpSum(orderId);
