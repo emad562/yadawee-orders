@@ -353,6 +353,7 @@ const PM={Paid:'paid',Unpaid:'unpaid',Partial:'partial'};
 
 function render(){
   if(!cur)return;
+  try{
   const dc=document.getElementById('dCurr').value;
   const q=document.getElementById('fSearch').value.toLowerCase();
   const fd=document.getElementById('fDel').value;
@@ -409,6 +410,7 @@ function render(){
   if(rm.length)h+=`${ov.length?'<br>':''}<strong>Follow-ups due soon (${rm.length}):</strong>`+rm.map(o=>`<div class="ritem"><span class="dot"></span>${o.client} - ${df(o.followUp)===0?'today':'in '+df(o.followUp)+'d'}</div>`).join('');
   if(h){rb.innerHTML=h;rb.classList.add('on');}else{rb.classList.remove('on');}
   renderTeam();
+  }catch(e){console.error('Render error:',e);document.getElementById('tbody').innerHTML='<tr><td colspan="11" style="color:red;padding:1rem">Display error: '+e.message+'</td></tr>';}
 }
 
 function renderTeam(){
