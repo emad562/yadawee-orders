@@ -6,11 +6,8 @@ const DEFAULT_USERS = [
   { username: "ahmed", password: "staff123", role: "staff" }
 ];
 
-const DEFAULT_ORDERS = [
-  { id: "YDW-001", date: "2026-03-01", client: "Noon Egypt", products: "Woven basket x20, Tote bag x15", total: 12400, currency: "EGP", payment: "Paid", delivery: "Delivered", dueDate: "2026-03-15", followUp: "", notes: "Repeat client.", addedBy: "manager" },
-  { id: "YDW-002", date: "2026-03-10", client: "Cairo Bazaar Co.", products: "Ceramic mug x30", total: 380, currency: "USD", payment: "Partial", delivery: "Shipped", dueDate: "2026-04-10", followUp: "", notes: "50% paid.", addedBy: "sara" },
-  { id: "YDW-003", date: "2026-03-18", client: "Heritage Gifts LLC", products: "Embroidered pouch x50", total: 9800, currency: "EGP", payment: "Unpaid", delivery: "Confirmed", dueDate: "2026-04-15", followUp: "2026-04-01", notes: "New client.", addedBy: "ahmed" }
-];
+const DEFAULT_ORDERS = [];
+const DEFAULT_ARTISANS = [];
 
 function respond(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -24,35 +21,76 @@ export default async (req) => {
   const action = url.searchParams.get("action");
   const store = getStore({ name: "yadawee", consistency: "strong" });
 
+  // LOAD ALL
   if (req.method === "GET" && action === "load") {
     let users = await store.get("users", { type: "json" });
     let orders = await store.get("orders", { type: "json" });
+    let artisans = await store.get("artisans", { type: "json" });
     if (!users) { users = DEFAULT_USERS; await store.setJSON("users", users); }
     if (!orders) { orders = DEFAULT_ORDERS; await store.setJSON("orders", orders); }
-    return respond({ users, orders });
+    if (!artisans) { artisans = DEFAULT_ARTISANS; await store.setJSON("artisans", artisans); }
+    return respond({ users, orders, artisans });
   }
 
+  // SAVE ORDERS
   if (req.method === "POST" && action === "save-orders") {
     const { orders } = await req.json();
     await store.setJSON("orders", orders);
     return respond({ ok: true });
   }
 
+  // SAVE USERS
   if (req.method === "POST" && action === "save-users") {
     const { users } = await req.json();
     await store.setJSON("users", users);
     return respond({ ok: true });
   }
 
+  // SAVE ARTISANS
+  if (req.method === "POST" && action === "save-artisans") {
+    const { artisans } = await req.json();
+    await store.setJSON("artisans", artisans);
+    return respond({ ok: true });
+  }
+
+  // LOAD EXPENSES
   if (req.method === "GET" && action === "load-expenses") {
     const orderId = url.searchParams.get("orderId");
     const expenses = await store.get("expenses-" + orderId, { type: "json" });
     return respond(expenses || []);
   }
 
+  // SAVE EXPENSES
   if (req.method === "POST" && action === "save-expenses") {
     const { orderId, expenses } = await req.json();
     await store.setJSON("expenses-" + orderId, expenses);
+    return respond({ ok: true });
+  }
+
+  // LOAD COMMENTS
+  if (req.method === "GET" && action === "load-comments") {
+    const orderId = url.searchParams.get("orderId");
+    const comments = await store.get("comments-" + orderId, { type: "json" });
+    return respond(comments || []);
+  }
+
+  // SAVE COMMENTS
+  if (req.method === "POST" && action === "save-comments") {
+    const { orderId, comments } = await req.json();
+    await store.setJSON("comments-" + orderId, comments);
+    return respond({ ok: true });
+  }
+
+  // LOAD ACTIVITY LOG
+  if (req.method === "GET" && action === "load-activity") {
+    const activity = await store.get("activity-log", { type: "json" });
+    return respond(activity || []);
+  }
+
+  // SAVE ACTIVITY LOG
+  if (req.method === "POST" && action === "save-activity") {
+    const { log } = await req.json();
+    await store.setJSON("activity-log", log);
     return respond({ ok: true });
   }
 

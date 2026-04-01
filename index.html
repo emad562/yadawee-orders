@@ -7,7 +7,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh;}
-.wrap{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;}
+.wrap{max-width:1300px;margin:0 auto;padding:2rem 1.5rem;}
 .login-box{max-width:380px;margin:6rem auto;background:#fff;border:1px solid #e0e0db;border-radius:12px;padding:2rem;}
 .login-box h2{font-size:20px;font-weight:500;margin-bottom:6px;}
 .login-box p{font-size:13px;color:#888;margin-bottom:1.5rem;}
@@ -16,8 +16,9 @@ input,select,textarea{width:100%;font-size:14px;padding:8px 10px;border:1px soli
 input:focus,select:focus,textarea:focus{border-color:#1D9E75;}
 textarea{resize:vertical;min-height:64px;margin-bottom:0;}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
 .g21{display:grid;grid-template-columns:2fr 1fr;gap:10px;}
-@media(max-width:520px){.g2,.g21{grid-template-columns:1fr;}}
+@media(max-width:520px){.g2,.g21,.g3{grid-template-columns:1fr;}}
 .btn{padding:7px 14px;border:1px solid #ccc;border-radius:8px;background:transparent;color:#1a1a1a;font-size:13px;cursor:pointer;font-family:inherit;}
 .btn:hover{background:#f0f0ed;}
 .btn.green{background:#1D9E75;color:#fff;border-color:#1D9E75;width:100%;padding:10px;font-size:14px;}
@@ -27,6 +28,8 @@ textarea{resize:vertical;min-height:64px;margin-bottom:0;}
 .btn.blue:hover{background:#eef4fb;}
 .btn.red{border-color:#E24B4A;color:#A32D2D;}
 .btn.red:hover{background:#fff0f0;}
+.btn.amber{border-color:#BA7517;color:#854F0B;}
+.btn.amber:hover{background:#fffbf0;}
 .btn.sm{padding:4px 10px;font-size:12px;}
 .err{font-size:12px;color:#A32D2D;min-height:18px;margin-bottom:4px;}
 .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:12px;}
@@ -41,7 +44,7 @@ textarea{resize:vertical;min-height:64px;margin-bottom:0;}
 .metric{background:#fff;border-radius:8px;padding:0.85rem 1rem;border:1px solid #e8e8e4;}
 .mlbl{font-size:12px;color:#888;margin-bottom:4px;}
 .mval{font-size:20px;font-weight:500;}
-.mval.g{color:#1D9E75;}.mval.a{color:#BA7517;}.mval.r{color:#E24B4A;}
+.mval.g{color:#1D9E75;}.mval.a{color:#BA7517;}.mval.r{color:#E24B4A;}.mval.b{color:#185FA5;}
 .rbar{background:#FAEEDA;border:1px solid #FAC775;border-radius:8px;padding:10px 14px;margin-bottom:1.25rem;font-size:13px;color:#633806;display:none;}
 .rbar.on{display:block;}
 .ritem{margin-top:4px;display:flex;align-items:center;gap:6px;}
@@ -56,8 +59,8 @@ textarea{resize:vertical;min-height:64px;margin-bottom:0;}
 .syncbar{display:flex;align-items:center;gap:8px;font-size:12px;color:#888;}
 .sdot{width:7px;height:7px;border-radius:50%;background:#1D9E75;flex-shrink:0;}
 .sdot.s{background:#BA7517;}.sdot.e{background:#E24B4A;}
-.tabs{display:flex;gap:0;border-bottom:1px solid #e8e8e4;margin-bottom:1.25rem;}
-.tab{padding:9px 16px;font-size:13px;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.tabs{display:flex;gap:0;border-bottom:1px solid #e8e8e4;margin-bottom:1.25rem;overflow-x:auto;}
+.tab{padding:9px 16px;font-size:13px;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;}
 .tab.on{color:#1D9E75;border-bottom-color:#1D9E75;font-weight:500;}
 .card{background:#fff;border:1px solid #e8e8e4;border-radius:12px;overflow:hidden;}
 .tscroll{overflow-x:auto;}
@@ -88,9 +91,9 @@ tr.ds td{background:#fffbf4;}
 .empty{text-align:center;padding:2.5rem;color:#888;font-size:14px;}
 .slabel{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin:1rem 0 6px;}
 .hint{font-size:11px;color:#888;margin-top:2px;}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:flex-start;justify-content:center;padding-top:40px;overflow-y:auto;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:flex-start;justify-content:center;padding-top:30px;overflow-y:auto;}
 .overlay.on{display:flex;}
-.modal{background:#fff;border-radius:12px;border:1px solid #e0e0db;padding:1.5rem;width:100%;max-width:500px;margin-bottom:40px;}
+.modal{background:#fff;border-radius:12px;border:1px solid #e0e0db;padding:1.5rem;width:100%;max-width:520px;margin-bottom:40px;}
 .modal h3{font-size:16px;font-weight:500;margin-bottom:1rem;}
 .mfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;}
 .conf-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:center;justify-content:center;}
@@ -107,6 +110,29 @@ tr.ds td{background:#fffbf4;}
 .profit-bar{height:8px;border-radius:4px;background:#f0f0ec;margin:8px 0;overflow:hidden;}
 .profit-fill{height:100%;border-radius:4px;background:#1D9E75;transition:width 0.3s;}
 .profit-fill.neg{background:#E24B4A;}
+.comment-item{padding:10px 12px;border-bottom:1px solid #f0f0ec;font-size:13px;}
+.comment-item:last-child{border-bottom:none;}
+.comment-meta{font-size:11px;color:#888;margin-bottom:4px;}
+.comment-meta strong{color:#1a1a1a;}
+.activity-item{padding:8px 12px;border-bottom:1px solid #f0f0ec;font-size:12px;color:#666;}
+.activity-item:last-child{border-bottom:none;}
+.activity-item strong{color:#1a1a1a;}
+.activity-time{font-size:11px;color:#aaa;margin-top:2px;}
+.impact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem;}
+@media(max-width:600px){.impact-grid{grid-template-columns:1fr 1fr;}}
+.impact-card{background:#fff;border:1px solid #e8e8e4;border-radius:10px;padding:1rem;text-align:center;}
+.impact-card .il{font-size:12px;color:#888;margin-bottom:6px;}
+.impact-card .iv{font-size:24px;font-weight:500;color:#1D9E75;}
+.impact-card .iv.b{color:#185FA5;}
+.impact-card .iv.a{color:#BA7517;}
+.report-section{background:#fff;border:1px solid #e8e8e4;border-radius:10px;padding:1.25rem;margin-bottom:1rem;}
+.report-section h4{font-size:14px;font-weight:500;margin-bottom:0.75rem;color:#1a1a1a;}
+.artisan-card{background:#fff;border:1px solid #e8e8e4;border-radius:10px;padding:1rem;display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;}
+.artisan-avatar{width:40px;height:40px;border-radius:50%;background:#E1F5EE;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;color:#0F6E56;flex-shrink:0;}
+.artisan-info{flex:1;}
+.artisan-name{font-weight:500;font-size:14px;margin-bottom:2px;}
+.artisan-meta{font-size:12px;color:#888;}
+.artisan-actions{display:flex;gap:6px;}
 </style>
 </head>
 <body>
@@ -137,9 +163,13 @@ tr.ds td{background:#fffbf4;}
 
   <div class="tabs">
     <div class="tab on" id="tOrders" onclick="showTab('orders')">Orders</div>
+    <div class="tab" id="tArtisans" onclick="showTab('artisans')">Artisans</div>
+    <div class="tab" id="tActivity" onclick="showTab('activity')">Activity log</div>
+    <div class="tab" id="tImpact" onclick="showTab('impact')">Impact report</div>
     <div class="tab" id="tTeam" onclick="showTab('team')" style="display:none">Team</div>
   </div>
 
+  <!-- ORDERS TAB -->
   <div id="vOrders">
     <div class="tabbar">
       <div class="syncbar"><span class="sdot" id="sdot"></span><span id="slbl">Loading...</span></div>
@@ -197,6 +227,41 @@ tr.ds td{background:#fffbf4;}
     </div></div>
   </div>
 
+  <!-- ARTISANS TAB -->
+  <div id="vArtisans" style="display:none">
+    <div class="tabbar">
+      <span style="font-size:14px;color:#888">Track your artisan team</span>
+      <button class="btn green gs" onclick="openArtisan()">+ add artisan</button>
+    </div>
+    <div class="metrics" id="artisanMetrics"></div>
+    <div id="artisanList"></div>
+  </div>
+
+  <!-- ACTIVITY LOG TAB -->
+  <div id="vActivity" style="display:none">
+    <div class="tabbar">
+      <span style="font-size:14px;color:#888">All changes made to orders</span>
+      <button class="btn red sm" id="btnClearActivity" onclick="clearActivity()" style="display:none">Clear log</button>
+    </div>
+    <div class="card">
+      <div id="activityList" style="max-height:600px;overflow-y:auto"></div>
+    </div>
+  </div>
+
+  <!-- IMPACT REPORT TAB -->
+  <div id="vImpact" style="display:none">
+    <div class="tabbar">
+      <span style="font-size:14px;color:#888">Monthly social impact report</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="impactMonth" onchange="renderImpact()" style="margin:0;width:auto;padding:6px 10px;font-size:13px">
+        </select>
+        <button class="btn green gs" onclick="printReport()">Print / Save PDF</button>
+      </div>
+    </div>
+    <div id="impactContent"></div>
+  </div>
+
+  <!-- TEAM TAB -->
   <div id="vTeam" style="display:none">
     <div class="tabbar">
       <span style="font-size:14px;color:#888">Manage team members</span>
@@ -211,23 +276,30 @@ tr.ds td{background:#fffbf4;}
   </div>
 </div>
 
+<!-- ORDER MODAL -->
 <div class="overlay" id="oOrder">
-<div class="modal">
+<div class="modal" style="max-width:560px">
   <h3 id="oTitle">New order</h3>
   <div class="slabel">Order details</div>
   <div class="g2">
     <div><label>Client name</label><input type="text" id="oClient" placeholder="e.g. Noon Egypt"/></div>
     <div><label>Order date</label><input type="date" id="oDate"/></div>
   </div>
-  <label>Products and quantities</label>
-  <input type="text" id="oProducts" placeholder="e.g. Woven basket x10, Tote x5"/>
+  <div class="g2">
+    <div><label>Products and quantities</label><input type="text" id="oProducts" placeholder="e.g. Woven basket x10"/></div>
+    <div>
+      <label>Assigned artisans</label>
+      <select id="oArtisans" multiple style="height:70px;margin-bottom:12px">
+      </select>
+    </div>
+  </div>
   <div class="g21">
     <div><label>Total amount</label><input type="number" id="oTotal" placeholder="0" oninput="convHint()"/><div class="hint" id="oHint"></div></div>
     <div><label>Currency</label><select id="oCurr" onchange="convHint()"><option>EGP</option><option>USD</option><option>EUR</option><option>SAR</option><option>GBP</option><option>AED</option></select></div>
   </div>
   <div class="g2">
     <div><label>Payment</label><select id="oPay"><option>Unpaid</option><option>Partial</option><option>Paid</option></select></div>
-    <div><label>Delivery</label><select id="oDel"><option>Pending</option><option>Confirmed</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option></select></div>
+    <div><label>Delivery</label><select id="oDel2"><option>Pending</option><option>Confirmed</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option></select></div>
   </div>
   <div class="slabel">Follow-up and reminders</div>
   <div class="g2">
@@ -237,37 +309,40 @@ tr.ds td{background:#fffbf4;}
   <label>Notes</label>
   <textarea id="oNotes" placeholder="Any notes for the team..."></textarea>
   <div class="mfoot">
-    <button class="btn red sm" id="oDel2" style="margin-right:auto;display:none" onclick="askDelete()">Delete</button>
+    <button class="btn red sm" id="oDel3" style="margin-right:auto;display:none" onclick="askDelete()">Delete</button>
     <button class="btn" onclick="closeOrder()">Cancel</button>
     <button class="btn green gs" onclick="saveOrder()">Save order</button>
   </div>
 </div>
 </div>
 
-<div class="overlay" id="oUser">
-<div class="modal" style="max-width:360px">
-  <h3>Add team member</h3>
-  <label>Username</label><input type="text" id="uName" placeholder="e.g. layla"/>
-  <label>Password</label><input type="text" id="uPass" placeholder="Set a password"/>
-  <label>Role</label><select id="uRole2"><option value="staff">Staff</option><option value="manager">Manager</option></select>
-  <div class="err" id="uErr"></div>
+<!-- ARTISAN MODAL -->
+<div class="overlay" id="oArtisan">
+<div class="modal">
+  <h3 id="aTitle">Add artisan</h3>
+  <div class="g2">
+    <div><label>Full name</label><input type="text" id="aName" placeholder="e.g. Fatima Hassan"/></div>
+    <div><label>Phone number</label><input type="text" id="aPhone" placeholder="e.g. 010xxxxxxxx"/></div>
+  </div>
+  <div class="g2">
+    <div><label>Craft specialty</label><input type="text" id="aSpecialty" placeholder="e.g. Weaving, Ceramics"/></div>
+    <div><label>Location / governorate</label><input type="text" id="aLocation" placeholder="e.g. Cairo, Aswan"/></div>
+  </div>
+  <div class="g2">
+    <div><label>Date joined Yadawee</label><input type="date" id="aJoined"/></div>
+    <div><label>Monthly wage (EGP)</label><input type="number" id="aWage" placeholder="0"/></div>
+  </div>
+  <label>Notes</label>
+  <textarea id="aNotes" placeholder="e.g. Part time, works 2 weeks per month..."></textarea>
   <div class="mfoot">
-    <button class="btn" onclick="closeUser()">Cancel</button>
-    <button class="btn green gs" onclick="saveUser()">Add member</button>
+    <button class="btn red sm" id="aDelBtn" style="margin-right:auto;display:none" onclick="deleteArtisan()">Remove</button>
+    <button class="btn" onclick="closeArtisan()">Cancel</button>
+    <button class="btn green gs" onclick="saveArtisan()">Save artisan</button>
   </div>
 </div>
 </div>
 
-<div class="conf-overlay" id="oConf">
-<div class="conf">
-  <p>Delete this order? This cannot be undone.</p>
-  <div style="display:flex;gap:8px;justify-content:flex-end">
-    <button class="btn" onclick="closeConf()">Cancel</button>
-    <button class="btn red" onclick="doDelete()">Delete</button>
-  </div>
-</div>
-</div>
-
+<!-- EXPENSES MODAL -->
 <div class="overlay" id="oExp">
 <div class="modal" style="max-width:640px">
   <h3 id="expTitle">Expenses</h3>
@@ -282,6 +357,48 @@ tr.ds td{background:#fffbf4;}
 </div>
 </div>
 
+<!-- COMMENTS MODAL -->
+<div class="overlay" id="oComments">
+<div class="modal" style="max-width:520px">
+  <h3 id="commTitle">Comments</h3>
+  <div class="card" style="margin-bottom:1rem">
+    <div id="commList" style="max-height:280px;overflow-y:auto;min-height:60px"></div>
+  </div>
+  <label>Add a comment</label>
+  <textarea id="commText" placeholder="Write a note or update for the team..." style="margin-bottom:8px"></textarea>
+  <div class="mfoot">
+    <button class="btn" onclick="closeComments()">Close</button>
+    <button class="btn green gs" onclick="addComment()">Post comment</button>
+  </div>
+</div>
+</div>
+
+<!-- USER MODAL -->
+<div class="overlay" id="oUser">
+<div class="modal" style="max-width:360px">
+  <h3>Add team member</h3>
+  <label>Username</label><input type="text" id="uName" placeholder="e.g. layla"/>
+  <label>Password</label><input type="text" id="uPass" placeholder="Set a password"/>
+  <label>Role</label><select id="uRole2"><option value="staff">Staff</option><option value="manager">Manager</option></select>
+  <div class="err" id="uErr"></div>
+  <div class="mfoot">
+    <button class="btn" onclick="closeUser()">Cancel</button>
+    <button class="btn green gs" onclick="saveUser()">Add member</button>
+  </div>
+</div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div class="conf-overlay" id="oConf">
+<div class="conf">
+  <p>Delete this order? This cannot be undone.</p>
+  <div style="display:flex;gap:8px;justify-content:flex-end">
+    <button class="btn" onclick="closeConf()">Cancel</button>
+    <button class="btn red" onclick="doDelete()">Delete</button>
+  </div>
+</div>
+</div>
+
 <script>
 const R={EGP:1,USD:0.020,EUR:0.019,SAR:0.076,GBP:0.016,AED:0.074};
 const SYM={EGP:'EGP',USD:'$',EUR:'EUR',SAR:'SAR',GBP:'GBP',AED:'AED'};
@@ -289,7 +406,10 @@ const f=(v,c)=>SYM[c]+' '+Math.round(v).toLocaleString();
 const toE=(a,c)=>a/R[c];
 const frE=(e,c)=>e*R[c];
 
-let cur=null,orders=[],users=[],editId=null,delId=null,sk='date',sd=-1,ctr=10;
+let cur=null,orders=[],users=[],artisans=[],activityLog=[],editId=null,delId=null,editArtisanId=null,commOrderId=null,expOrderId=null;
+let sk='date',sd=-1,ctr=10;
+let expRows=[];
+const EXP_CATS=['Raw materials','Artisan wages','Packaging','Shipping / transport','Other'];
 const nid=()=>'YDW-'+(ctr++).toString().padStart(3,'0');
 
 async function api(action,body){
@@ -307,6 +427,7 @@ async function login(){
     const d=await api('load');
     users=Array.isArray(d.users)?d.users:[];
     orders=Array.isArray(d.orders)?d.orders:[];
+    artisans=Array.isArray(d.artisans)?d.artisans:[];
     ctr=orders.reduce((m,o)=>{const n=parseInt((o.id||'').replace(/\D/g,''));return n>m?n:m;},9)+1;
     const found=users.find(x=>x.username===u&&x.password===p);
     if(!found){document.getElementById('loginErr').textContent='Incorrect username or password.';btn.textContent='Sign in';btn.disabled=false;return;}
@@ -315,19 +436,46 @@ async function login(){
     document.getElementById('vMain').style.display='block';
     document.getElementById('uLabel').textContent=cur.username;
     const rb=document.getElementById('uRole');rb.textContent=cur.role;rb.className='rbadge '+cur.role;
-    if(cur.role==='manager')document.getElementById('tTeam').style.display='';
+    if(cur.role==='manager'){
+      document.getElementById('tTeam').style.display='';
+      document.getElementById('btnClearActivity').style.display='';
+    }
+    activityLog=await api('load-activity');
+    if(!Array.isArray(activityLog))activityLog=[];
+    populateMonths();
     sync('ok');render();
   }catch(e){document.getElementById('loginErr').textContent='Connection error. Try again.';btn.textContent='Sign in';btn.disabled=false;}
 }
 
-function logout(){cur=null;document.getElementById('vMain').style.display='none';document.getElementById('vLogin').style.display='block';document.getElementById('iUser').value='';document.getElementById('iPass').value='';document.getElementById('loginErr').textContent='';document.getElementById('loginBtn').textContent='Sign in';document.getElementById('loginBtn').disabled=false;document.getElementById('tTeam').style.display='none';}
+function logout(){
+  cur=null;orders=[];users=[];artisans=[];activityLog=[];
+  document.getElementById('vMain').style.display='none';
+  document.getElementById('vLogin').style.display='block';
+  document.getElementById('iUser').value='';document.getElementById('iPass').value='';
+  document.getElementById('loginErr').textContent='';
+  document.getElementById('loginBtn').textContent='Sign in';document.getElementById('loginBtn').disabled=false;
+  document.getElementById('tTeam').style.display='none';
+}
 
-function sync(s){const d=document.getElementById('sdot'),l=document.getElementById('slbl');d.className='sdot'+(s==='s'?' s':s==='e'?' e':'');l.textContent=s==='s'?'Saving...':s==='e'?'Error saving - data may not be synced':'Synced - works on all devices';}
+function sync(s){
+  const d=document.getElementById('sdot'),l=document.getElementById('slbl');
+  d.className='sdot'+(s==='s'?' s':s==='e'?' e':'');
+  l.textContent=s==='s'?'Saving...':s==='e'?'Error saving':'Synced - works on all devices';
+}
 
-function showTab(t){document.getElementById('vOrders').style.display=t==='orders'?'':'none';document.getElementById('vTeam').style.display=t==='team'?'':'none';document.getElementById('tOrders').className='tab'+(t==='orders'?' on':'');document.getElementById('tTeam').className='tab'+(t==='team'?' on':'');}
+function showTab(t){
+  ['Orders','Artisans','Activity','Impact','Team'].forEach(x=>{
+    document.getElementById('v'+x).style.display=t===x.toLowerCase()?'':'none';
+    document.getElementById('t'+x).className='tab'+(t===x.toLowerCase()?' on':'');
+  });
+  if(t==='artisans')renderArtisans();
+  if(t==='activity')renderActivity();
+  if(t==='impact')renderImpact();
+  if(t==='team')renderTeam();
+}
 
 function srt(k){if(sk===k)sd*=-1;else{sk=k;sd=-1;}render();}
-const egp=o=>toE(o.total,o.currency);
+const egp=o=>toE(o.total||0,o.currency||'EGP');
 
 const today=new Date();today.setHours(0,0,0,0);
 const df=s=>{if(!s)return null;const d=new Date(s);d.setHours(0,0,0,0);return Math.round((d-today)/86400000);};
@@ -340,13 +488,13 @@ function dueTag(due,pay){
   if(d<=7)return `<span class="dtag ds">Due in ${d}d</span>`;
   return `<span class="dtag ok">${due}</span>`;
 }
-function fuTag(f){
-  if(!f)return '<span style="color:#aaa;font-size:12px">-</span>';
-  const d=df(f);
-  if(d<0)return `<span class="dtag ov">Was ${f}</span>`;
+function fuTag(f2){
+  if(!f2)return '<span style="color:#aaa;font-size:12px">-</span>';
+  const d=df(f2);
+  if(d<0)return `<span class="dtag ov">Was ${f2}</span>`;
   if(d===0)return `<span class="dtag ds">Today</span>`;
   if(d<=3)return `<span class="dtag ds">In ${d}d</span>`;
-  return `<span style="font-size:12px;color:#888">${f}</span>`;
+  return `<span style="font-size:12px;color:#888">${f2}</span>`;
 }
 const DM={Confirmed:'confirmed',Pending:'pending',Shipped:'shipped',Delivered:'delivered',Cancelled:'cancelled'};
 const PM={Paid:'paid',Unpaid:'unpaid',Partial:'partial'};
@@ -360,7 +508,7 @@ function render(){
   const fp=document.getElementById('fPay').value;
   const fdu=document.getElementById('fDue').value;
   let rows=orders.filter(o=>{
-    if(q&&!o.client.toLowerCase().includes(q)&&!o.id.toLowerCase().includes(q))return false;
+    if(q&&!((o.client||'').toLowerCase().includes(q)||(o.id||'').toLowerCase().includes(q)))return false;
     if(fd&&o.delivery!==fd)return false;
     if(fp&&o.payment!==fp)return false;
     if(fdu){const d=df(o.dueDate);if(fdu==='overdue'&&(d===null||d>=0))return false;if(fdu==='soon'&&(d===null||d<0||d>7))return false;}
@@ -370,7 +518,6 @@ function render(){
     if(sk==='egp')return(egp(a)-egp(b))*sd;
     return String(a[sk]||'').localeCompare(String(b[sk]||''))*sd;
   });
-  const isM=cur.role==='manager';
   const tb=document.getElementById('tbody');
   if(!rows.length){tb.innerHTML='<tr><td colspan="11"><div class="empty">No orders found</div></td></tr>';}
   else{
@@ -378,18 +525,23 @@ function render(){
       const dv=frE(egp(o),dc),so=o.currency!==dc;
       const d=df(o.dueDate);
       const rc=o.payment!=='Paid'&&d!==null&&d<0?'ov':o.payment!=='Paid'&&d!==null&&d<=7?'ds':'';
+      const artNames=(o.artisans||[]).map(id=>{const a=artisans.find(x=>x.id===id);return a?a.name:'';}).filter(Boolean).join(', ');
       return `<tr class="${rc}">
         <td style="font-weight:500;font-family:monospace;font-size:12px">${o.id}</td>
         <td style="white-space:nowrap;color:#888">${o.date}</td>
         <td style="white-space:nowrap">${o.client}</td>
-        <td style="max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#888" title="${o.products}">${o.products}</td>
+        <td style="max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#888" title="${o.products||''}">${o.products||'-'}</td>
         <td style="font-weight:500;white-space:nowrap">${f(dv,dc)}${so?`<span class="cbadge">${f(o.total,o.currency)}</span>`:''}</td>
         <td><span class="badge ${PM[o.payment]}">${o.payment}</span></td>
         <td><span class="badge ${DM[o.delivery]}">${o.delivery}</span></td>
         <td>${dueTag(o.dueDate,o.payment)}<br><span style="font-size:11px;color:#aaa">follow-up: </span>${fuTag(o.followUp)}</td>
-        <td style="max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#888;font-size:12px" title="${o.notes||''}">${o.notes||'-'}</td>
+        <td style="max-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#888;font-size:12px" title="${o.notes||''}">${o.notes||'-'}</td>
         <td style="font-size:12px;color:#aaa">${o.addedBy||''}</td>
-        <td><button class="btn sm" onclick="openOrder('${o.id}')">Edit</button> <button class="btn sm blue" onclick="openExp('${o.id}','${o.client}')">Expenses</button></td>
+        <td style="white-space:nowrap">
+          <button class="btn sm" onclick="openOrder('${o.id}')">Edit</button>
+          <button class="btn sm blue" onclick="openExp('${o.id}','${o.client}')">Exp</button>
+          <button class="btn sm amber" onclick="openComments('${o.id}','${o.client}')">Notes</button>
+        </td>
       </tr>`;
     }).join('');
   }
@@ -410,45 +562,317 @@ function render(){
   if(rm.length)h+=`${ov.length?'<br>':''}<strong>Follow-ups due soon (${rm.length}):</strong>`+rm.map(o=>`<div class="ritem"><span class="dot"></span>${o.client} - ${df(o.followUp)===0?'today':'in '+df(o.followUp)+'d'}</div>`).join('');
   if(h){rb.innerHTML=h;rb.classList.add('on');}else{rb.classList.remove('on');}
   renderTeam();
-  }catch(e){console.error('Render error:',e);document.getElementById('tbody').innerHTML='<tr><td colspan="11" style="color:red;padding:1rem">Display error: '+e.message+'</td></tr>';}
+  }catch(e){console.error('Render error:',e);document.getElementById('tbody').innerHTML=`<tr><td colspan="11" style="color:red;padding:1rem">Display error: ${e.message}</td></tr>`;}
 }
 
-function renderTeam(){
-  const tb=document.getElementById('utbody');if(!tb)return;
-  tb.innerHTML=users.map(u=>`<tr>
-    <td style="font-weight:500">${u.username}</td>
-    <td><span class="rbadge ${u.role}">${u.role}</span></td>
-    <td style="color:#888">${orders.filter(o=>o.addedBy===u.username).length}</td>
-    <td>${u.username!=='manager'?`<button class="btn sm red" onclick="removeUser('${u.username}')">Remove</button>`:''}</td>
-  </tr>`).join('');
+// ARTISANS
+function renderArtisans(){
+  const totalWages=artisans.reduce((s,a)=>s+(parseFloat(a.wage)||0),0);
+  const specialties=[...new Set(artisans.map(a=>a.specialty).filter(Boolean))];
+  document.getElementById('artisanMetrics').innerHTML=`
+    <div class="metric"><div class="mlbl">Total artisans</div><div class="mval b">${artisans.length}</div></div>
+    <div class="metric"><div class="mlbl">Total monthly wages</div><div class="mval g">EGP ${Math.round(totalWages).toLocaleString()}</div></div>
+    <div class="metric"><div class="mlbl">Craft specialties</div><div class="mval a">${specialties.length}</div></div>
+    <div class="metric"><div class="mlbl">Avg monthly wage</div><div class="mval">EGP ${artisans.length?Math.round(totalWages/artisans.length).toLocaleString():0}</div></div>
+  `;
+  const list=document.getElementById('artisanList');
+  if(!artisans.length){list.innerHTML='<div class="empty">No artisans added yet. Click above to add your first artisan.</div>';return;}
+  list.innerHTML=artisans.map(a=>`
+    <div class="artisan-card">
+      <div class="artisan-avatar">${(a.name||'?')[0].toUpperCase()}</div>
+      <div class="artisan-info">
+        <div class="artisan-name">${a.name}</div>
+        <div class="artisan-meta">${[a.specialty,a.location].filter(Boolean).join(' · ')}</div>
+        <div class="artisan-meta" style="margin-top:4px">${a.phone||''} ${a.wage?'· EGP '+parseFloat(a.wage).toLocaleString()+'/mo':''}</div>
+        ${a.notes?`<div class="artisan-meta" style="margin-top:4px;font-style:italic">${a.notes}</div>`:''}
+      </div>
+      <div class="artisan-actions">
+        <button class="btn sm" onclick="openArtisan('${a.id}')">Edit</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openArtisan(id){
+  editArtisanId=id||null;
+  document.getElementById('aTitle').textContent=id?'Edit artisan':'Add artisan';
+  if(id){
+    const a=artisans.find(x=>x.id===id);
+    document.getElementById('aName').value=a.name||'';
+    document.getElementById('aPhone').value=a.phone||'';
+    document.getElementById('aSpecialty').value=a.specialty||'';
+    document.getElementById('aLocation').value=a.location||'';
+    document.getElementById('aJoined').value=a.joined||'';
+    document.getElementById('aWage').value=a.wage||'';
+    document.getElementById('aNotes').value=a.notes||'';
+    document.getElementById('aDelBtn').style.display=cur.role==='manager'?'':'none';
+  }else{
+    ['aName','aPhone','aSpecialty','aLocation','aJoined','aWage','aNotes'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('aDelBtn').style.display='none';
+  }
+  document.getElementById('oArtisan').classList.add('on');
+}
+function closeArtisan(){document.getElementById('oArtisan').classList.remove('on');}
+
+async function saveArtisan(){
+  const name=document.getElementById('aName').value.trim();
+  if(!name)return;
+  const a={
+    name,
+    phone:document.getElementById('aPhone').value.trim(),
+    specialty:document.getElementById('aSpecialty').value.trim(),
+    location:document.getElementById('aLocation').value.trim(),
+    joined:document.getElementById('aJoined').value,
+    wage:parseFloat(document.getElementById('aWage').value)||0,
+    notes:document.getElementById('aNotes').value.trim(),
+  };
+  if(editArtisanId){
+    const i=artisans.findIndex(x=>x.id===editArtisanId);
+    a.id=editArtisanId;artisans[i]=a;
+    logActivity(`Updated artisan: ${name}`);
+  }else{
+    a.id='ART-'+Date.now();
+    artisans.push(a);
+    logActivity(`Added artisan: ${name}`);
+  }
+  closeArtisan();sync('s');
+  await api('save-artisans',{artisans});
+  sync('ok');renderArtisans();
+}
+
+async function deleteArtisan(){
+  if(!editArtisanId)return;
+  const a=artisans.find(x=>x.id===editArtisanId);
+  artisans=artisans.filter(x=>x.id!==editArtisanId);
+  closeArtisan();
+  logActivity(`Removed artisan: ${a?a.name:editArtisanId}`);
+  sync('s');await api('save-artisans',{artisans});sync('ok');
+  renderArtisans();
+}
+
+// ACTIVITY LOG
+function logActivity(msg){
+  const entry={msg,by:cur?cur.username:'system',at:new Date().toISOString()};
+  activityLog.unshift(entry);
+  if(activityLog.length>500)activityLog=activityLog.slice(0,500);
+  api('save-activity',{log:activityLog});
+}
+
+function renderActivity(){
+  const list=document.getElementById('activityList');
+  if(!activityLog.length){list.innerHTML='<div class="empty">No activity recorded yet.</div>';return;}
+  list.innerHTML=activityLog.map(e=>{
+    const dt=new Date(e.at);
+    const timeStr=dt.toLocaleDateString('en-GB')+' '+dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="activity-item"><strong>${e.by}</strong> - ${e.msg}<div class="activity-time">${timeStr}</div></div>`;
+  }).join('');
+}
+
+async function clearActivity(){
+  if(!confirm('Clear all activity log entries?'))return;
+  activityLog=[];
+  await api('save-activity',{log:[]});
+  renderActivity();
+}
+
+// COMMENTS
+async function openComments(orderId,client){
+  commOrderId=orderId;
+  document.getElementById('commTitle').textContent='Comments - '+client+' ('+orderId+')';
+  document.getElementById('commText').value='';
+  const comments=await api('load-comments&orderId='+orderId);
+  renderComments(Array.isArray(comments)?comments:[]);
+  document.getElementById('oComments').classList.add('on');
+}
+function closeComments(){document.getElementById('oComments').classList.remove('on');}
+
+function renderComments(comments){
+  const list=document.getElementById('commList');
+  if(!comments.length){list.innerHTML='<div style="padding:1rem;color:#888;font-size:13px">No comments yet.</div>';return;}
+  list.innerHTML=comments.map(c=>{
+    const dt=new Date(c.at);
+    const timeStr=dt.toLocaleDateString('en-GB')+' '+dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="comment-item"><div class="comment-meta"><strong>${c.by}</strong> · ${timeStr}</div>${c.text}</div>`;
+  }).join('');
+  list.scrollTop=list.scrollHeight;
+}
+
+async function addComment(){
+  const text=document.getElementById('commText').value.trim();
+  if(!text)return;
+  const existing=await api('load-comments&orderId='+commOrderId);
+  const comments=Array.isArray(existing)?existing:[];
+  comments.push({text,by:cur.username,at:new Date().toISOString()});
+  await api('save-comments',{orderId:commOrderId,comments});
+  logActivity(`Commented on order ${commOrderId}`);
+  document.getElementById('commText').value='';
+  renderComments(comments);
+}
+
+// IMPACT REPORT
+function populateMonths(){
+  const sel=document.getElementById('impactMonth');
+  const months=[];
+  const now=new Date();
+  for(let i=0;i<12;i++){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    const val=d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0');
+    const label=d.toLocaleString('en-GB',{month:'long',year:'numeric'});
+    months.push(`<option value="${val}">${label}</option>`);
+  }
+  sel.innerHTML=months.join('');
+}
+
+function renderImpact(){
+  const sel=document.getElementById('impactMonth').value;
+  const [yr,mo]=sel.split('-').map(Number);
+  const monthOrders=orders.filter(o=>{
+    if(!o.date)return false;
+    const d=new Date(o.date);
+    return d.getFullYear()===yr&&(d.getMonth()+1)===mo;
+  });
+  const delivered=monthOrders.filter(o=>o.delivery==='Delivered');
+  const revenue=monthOrders.reduce((s,o)=>s+egp(o),0);
+  const paid=monthOrders.filter(o=>o.payment==='Paid').reduce((s,o)=>s+egp(o),0);
+  const totalWages=artisans.reduce((s,a)=>s+(parseFloat(a.wage)||0),0);
+  const wagesPct=revenue>0?Math.round((totalWages/revenue)*100):0;
+  const monthName=new Date(yr,mo-1,1).toLocaleString('en-GB',{month:'long',year:'numeric'});
+
+  document.getElementById('impactContent').innerHTML=`
+    <div id="printable-report">
+      <div style="text-align:center;margin-bottom:1.5rem;padding:1rem;background:#fff;border:1px solid #e8e8e4;border-radius:10px">
+        <div style="font-size:22px;font-weight:500;color:#1D9E75">Yadawee</div>
+        <div style="font-size:16px;color:#1a1a1a;margin-top:4px">Monthly Social Impact Report</div>
+        <div style="font-size:14px;color:#888;margin-top:2px">${monthName}</div>
+      </div>
+
+      <div class="impact-grid">
+        <div class="impact-card"><div class="il">Total orders</div><div class="iv">${monthOrders.length}</div></div>
+        <div class="impact-card"><div class="il">Orders delivered</div><div class="iv">${delivered.length}</div></div>
+        <div class="impact-card"><div class="il">Revenue (EGP)</div><div class="iv g">EGP ${Math.round(revenue).toLocaleString()}</div></div>
+        <div class="impact-card"><div class="il">Revenue collected</div><div class="iv g">EGP ${Math.round(paid).toLocaleString()}</div></div>
+        <div class="impact-card"><div class="il">Active artisans</div><div class="iv b">${artisans.length}</div></div>
+        <div class="impact-card"><div class="il">Total artisan wages</div><div class="iv a">EGP ${Math.round(totalWages).toLocaleString()}</div></div>
+      </div>
+
+      <div class="report-section">
+        <h4>Artisan employment impact</h4>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px">
+          <span>Artisan wages as % of revenue</span>
+          <strong style="color:${wagesPct>=30?'#1D9E75':'#BA7517'}">${wagesPct}%</strong>
+        </div>
+        <div class="profit-bar"><div class="profit-fill" style="width:${Math.min(100,wagesPct)}%;background:#185FA5"></div></div>
+        <div style="font-size:12px;color:#888;margin-top:8px">
+          ${artisans.length} artisans employed · EGP ${Math.round(totalWages).toLocaleString()} total wages paid this month
+        </div>
+      </div>
+
+      <div class="report-section">
+        <h4>Artisan roster</h4>
+        ${artisans.length?`
+        <table style="width:100%;font-size:13px;border-collapse:collapse">
+          <thead><tr style="border-bottom:1px solid #e8e8e4">
+            <th style="text-align:left;padding:6px;font-weight:500;color:#888">Name</th>
+            <th style="text-align:left;padding:6px;font-weight:500;color:#888">Specialty</th>
+            <th style="text-align:left;padding:6px;font-weight:500;color:#888">Location</th>
+            <th style="text-align:right;padding:6px;font-weight:500;color:#888">Monthly wage</th>
+          </tr></thead>
+          <tbody>${artisans.map(a=>`<tr style="border-bottom:1px solid #f0f0ec">
+            <td style="padding:6px">${a.name}</td>
+            <td style="padding:6px;color:#888">${a.specialty||'-'}</td>
+            <td style="padding:6px;color:#888">${a.location||'-'}</td>
+            <td style="padding:6px;text-align:right">EGP ${(parseFloat(a.wage)||0).toLocaleString()}</td>
+          </tr>`).join('')}</tbody>
+        </table>`:'<div style="color:#888;font-size:13px">No artisans added yet.</div>'}
+      </div>
+
+      <div class="report-section">
+        <h4>Orders this month</h4>
+        ${monthOrders.length?`
+        <table style="width:100%;font-size:13px;border-collapse:collapse">
+          <thead><tr style="border-bottom:1px solid #e8e8e4">
+            <th style="text-align:left;padding:6px;font-weight:500;color:#888">ID</th>
+            <th style="text-align:left;padding:6px;font-weight:500;color:#888">Client</th>
+            <th style="text-align:left;padding:6px;font-weight:500;color:#888">Amount</th>
+            <th style="text-align:left;padding:6px;font-weight:500;color:#888">Payment</th>
+            <th style="text-align:left;padding:6px;font-weight:500;color:#888">Delivery</th>
+          </tr></thead>
+          <tbody>${monthOrders.map(o=>`<tr style="border-bottom:1px solid #f0f0ec">
+            <td style="padding:6px;font-family:monospace">${o.id}</td>
+            <td style="padding:6px">${o.client}</td>
+            <td style="padding:6px">EGP ${Math.round(egp(o)).toLocaleString()}</td>
+            <td style="padding:6px">${o.payment}</td>
+            <td style="padding:6px">${o.delivery}</td>
+          </tr>`).join('')}</tbody>
+        </table>`:'<div style="color:#888;font-size:13px">No orders this month.</div>'}
+      </div>
+
+      <div style="text-align:center;font-size:11px;color:#aaa;margin-top:1rem">
+        Generated by Yadawee Order Manager · ${new Date().toLocaleDateString('en-GB')}
+      </div>
+    </div>
+  `;
+}
+
+function printReport(){
+  const content=document.getElementById('printable-report').innerHTML;
+  const w=window.open('','_blank');
+  w.document.write(`<html><head><title>Yadawee Impact Report</title>
+  <style>body{font-family:Arial,sans-serif;padding:2rem;color:#1a1a1a;max-width:800px;margin:0 auto;}
+  .impact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem;}
+  .impact-card{border:1px solid #e8e8e4;border-radius:8px;padding:1rem;text-align:center;}
+  .il{font-size:11px;color:#888;margin-bottom:6px;}
+  .iv{font-size:20px;font-weight:bold;color:#1D9E75;}
+  .iv.b{color:#185FA5;}.iv.a{color:#BA7517;}
+  .report-section{border:1px solid #e8e8e4;border-radius:8px;padding:1rem;margin-bottom:1rem;}
+  .report-section h4{font-size:14px;font-weight:bold;margin-bottom:0.75rem;}
+  .profit-bar{height:8px;border-radius:4px;background:#f0f0ec;margin:8px 0;}
+  .profit-fill{height:100%;border-radius:4px;background:#185FA5;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{padding:6px;text-align:left;}
+  @media print{body{padding:0;}}</style>
+  </head><body>${content}</body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),500);
+}
+
+// ORDER MODAL
+function populateArtisanSelect(){
+  const sel=document.getElementById('oArtisans');
+  sel.innerHTML=artisans.map(a=>`<option value="${a.id}">${a.name}${a.specialty?' ('+a.specialty+')':''}</option>`).join('');
 }
 
 function openOrder(id){
   editId=id||null;
+  populateArtisanSelect();
   document.getElementById('oTitle').textContent=id?'Edit order':'New order';
   if(id){
     const o=orders.find(x=>x.id===id);
-    document.getElementById('oClient').value=o.client;
-    document.getElementById('oDate').value=o.date;
-    document.getElementById('oProducts').value=o.products;
-    document.getElementById('oTotal').value=o.total;
-    document.getElementById('oCurr').value=o.currency;
-    document.getElementById('oPay').value=o.payment;
-    document.getElementById('oDel').value=o.delivery;
+    document.getElementById('oClient').value=o.client||'';
+    document.getElementById('oDate').value=o.date||'';
+    document.getElementById('oProducts').value=o.products||'';
+    document.getElementById('oTotal').value=o.total||'';
+    document.getElementById('oCurr').value=o.currency||'EGP';
+    document.getElementById('oPay').value=o.payment||'Unpaid';
+    document.getElementById('oDel2').value=o.delivery||'Pending';
     document.getElementById('oDue').value=o.dueDate||'';
     document.getElementById('oFollowUp').value=o.followUp||'';
     document.getElementById('oNotes').value=o.notes||'';
-    document.getElementById('oDel2').style.display=cur.role==='manager'?'':'none';
+    // Set artisans
+    const sel=document.getElementById('oArtisans');
+    Array.from(sel.options).forEach(opt=>{opt.selected=(o.artisans||[]).includes(opt.value);});
+    document.getElementById('oDel3').style.display=cur.role==='manager'?'':'none';
   }else{
     ['oClient','oProducts','oNotes'].forEach(i=>document.getElementById(i).value='');
     document.getElementById('oDate').value=new Date().toISOString().slice(0,10);
     document.getElementById('oTotal').value='';
     document.getElementById('oCurr').value='EGP';
     document.getElementById('oPay').value='Unpaid';
-    document.getElementById('oDel').value='Pending';
+    document.getElementById('oDel2').value='Pending';
     document.getElementById('oDue').value='';
     document.getElementById('oFollowUp').value='';
-    document.getElementById('oDel2').style.display='none';
+    document.getElementById('oDel3').style.display='none';
+    Array.from(document.getElementById('oArtisans').options).forEach(o=>o.selected=false);
   }
   document.getElementById('oHint').textContent='';
   document.getElementById('oOrder').classList.add('on');
@@ -459,35 +883,65 @@ async function saveOrder(){
   const client=document.getElementById('oClient').value.trim();
   const date=document.getElementById('oDate').value;
   if(!client||!date)return;
-  const o={client,date,
+  const selArtisans=Array.from(document.getElementById('oArtisans').selectedOptions).map(o=>o.value);
+  const o={
+    client,date,
     products:document.getElementById('oProducts').value.trim(),
     total:parseFloat(document.getElementById('oTotal').value)||0,
     currency:document.getElementById('oCurr').value,
     payment:document.getElementById('oPay').value,
-    delivery:document.getElementById('oDel').value,
+    delivery:document.getElementById('oDel2').value,
     dueDate:document.getElementById('oDue').value,
     followUp:document.getElementById('oFollowUp').value,
     notes:document.getElementById('oNotes').value.trim(),
-    addedBy:cur.username
+    addedBy:cur.username,
+    artisans:selArtisans,
   };
-  if(editId){const i=orders.findIndex(x=>x.id===editId);o.id=editId;o.addedBy=orders[i].addedBy;orders[i]=o;}
-  else{o.id=nid();orders.unshift(o);}
+  if(editId){
+    const i=orders.findIndex(x=>x.id===editId);
+    const old=orders[i];
+    o.id=editId;o.addedBy=old.addedBy;
+    orders[i]=o;
+    // Log changes
+    if(old.delivery!==o.delivery)logActivity(`Order ${editId}: delivery changed from ${old.delivery} to ${o.delivery}`);
+    if(old.payment!==o.payment)logActivity(`Order ${editId}: payment changed from ${old.payment} to ${o.payment}`);
+    if(old.client!==o.client||old.total!==o.total)logActivity(`Order ${editId}: details updated by ${cur.username}`);
+  }else{
+    o.id=nid();orders.unshift(o);
+    logActivity(`New order ${o.id} added for ${client} by ${cur.username}`);
+  }
   closeOrder();sync('s');
-  try{await api('save-orders',{orders});sync('ok');}catch{sync('e');}
-  render();
+  await api('save-orders',{orders});
+  sync('ok');render();
 }
 
 function askDelete(){delId=editId;document.getElementById('oConf').classList.add('on');}
 function closeConf(){document.getElementById('oConf').classList.remove('on');delId=null;}
 async function doDelete(){
   if(!delId)return;
-  orders=orders.filter(o=>o.id!==delId);
-  closeConf();closeOrder();sync('s');
-  try{await api('save-orders',{orders});sync('ok');}catch{sync('e');}
-  render();
+  const o=orders.find(x=>x.id===delId);
+  orders=orders.filter(x=>x.id!==delId);
+  closeConf();closeOrder();
+  logActivity(`Order ${delId} (${o?o.client:''}) deleted by ${cur.username}`);
+  sync('s');await api('save-orders',{orders});sync('ok');render();
 }
 
-function openUser(){document.getElementById('uName').value='';document.getElementById('uPass').value='';document.getElementById('uRole2').value='staff';document.getElementById('uErr').textContent='';document.getElementById('oUser').classList.add('on');}
+// TEAM
+function renderTeam(){
+  const tb=document.getElementById('utbody');if(!tb)return;
+  tb.innerHTML=users.map(u=>`<tr>
+    <td style="font-weight:500">${u.username}</td>
+    <td><span class="rbadge ${u.role}">${u.role}</span></td>
+    <td style="color:#888">${orders.filter(o=>o.addedBy===u.username).length}</td>
+    <td>${u.username!=='manager'&&cur&&cur.role==='manager'?`<button class="btn sm red" onclick="removeUser('${u.username}')">Remove</button>`:''}</td>
+  </tr>`).join('');
+}
+
+function openUser(){
+  document.getElementById('uName').value='';document.getElementById('uPass').value='';
+  document.getElementById('uRole2').value='staff';document.getElementById('uErr').textContent='';
+  document.getElementById('oUser').classList.add('on');
+}
 function closeUser(){document.getElementById('oUser').classList.remove('on');}
 async function saveUser(){
   const un=document.getElementById('uName').value.trim().toLowerCase();
@@ -496,45 +950,34 @@ async function saveUser(){
   if(!un||!pw){document.getElementById('uErr').textContent='Username and password required.';return;}
   if(users.find(u=>u.username===un)){document.getElementById('uErr').textContent='Username already exists.';return;}
   users.push({username:un,password:pw,role});
-  closeUser();
-  try{await api('save-users',{users});}catch{}
-  render();
+  logActivity(`New team member added: ${un} (${role})`);
+  closeUser();await api('save-users',{users});render();
 }
 async function removeUser(un){
   if(un==='manager')return;
   if(!confirm('Remove '+un+' from the team?'))return;
   users=users.filter(u=>u.username!==un);
-  try{await api('save-users',{users});}catch{}
-  render();
+  logActivity(`Team member removed: ${un}`);
+  await api('save-users',{users});render();
 }
 
-function convHint(){
-  const a=parseFloat(document.getElementById('oTotal').value)||0;
-  const c=document.getElementById('oCurr').value;
-  document.getElementById('oHint').textContent=c!=='EGP'&&a?'approx EGP '+Math.round(toE(a,c)).toLocaleString():'';
-}
-
-let expOrderId=null, expRows=[];
-const EXP_CATS=['Raw materials','Artisan wages','Packaging','Shipping / transport','Other'];
-
-async function openExp(orderId, client){
+// EXPENSES
+async function openExp(orderId,client){
   expOrderId=orderId;
   document.getElementById('expTitle').textContent='Expenses - '+client+' ('+orderId+')';
-  const expData=await fetch('/api/data?action=load-expenses&orderId='+orderId);
-  expRows=await expData.json();
-  if(!Array.isArray(expRows)) expRows=[];
-  if(!Array.isArray(expRows)) expRows=[];
+  const data=await fetch('/api/data?action=load-expenses&orderId='+orderId);
+  expRows=await data.json();
+  if(!Array.isArray(expRows))expRows=[];
   renderExpRows();
-  renderExpSum(orderId);
   document.getElementById('oExp').classList.add('on');
 }
 function closeExp(){document.getElementById('oExp').classList.remove('on');expOrderId=null;expRows=[];}
 
 function renderExpRows(){
   const o=orders.find(x=>x.id===expOrderId);
-  const rev=o?Math.round(toE(o.total,o.currency)):0;
+  const rev=o?Math.round(toE(o.total||0,o.currency||'EGP')):0;
   const container=document.getElementById('expRows');
-  if(!expRows.length){container.innerHTML='<div style="color:#aaa;font-size:13px;padding:8px 0">No expenses added yet. Click below to add one.</div>';renderExpSum2(rev);return;}
+  if(!expRows.length){container.innerHTML='<div style="color:#aaa;font-size:13px;padding:8px 0">No expenses yet. Click below to add.</div>';renderExpSum2(rev);return;}
   container.innerHTML=expRows.map((r,i)=>`
     <div class="exp-row">
       <select onchange="expRows[${i}].cat=this.value;renderExpSum2(${rev})" style="margin:0">${EXP_CATS.map(c=>`<option${r.cat===c?' selected':''}>${c}</option>`).join('')}</select>
@@ -546,16 +989,7 @@ function renderExpRows(){
   renderExpSum2(rev);
 }
 
-function addExpRow(){
-  expRows.push({cat:'Raw materials',desc:'',amount:0});
-  renderExpRows();
-}
-
-function renderExpSum(orderId){
-  const o=orders.find(x=>x.id===orderId);
-  const rev=o?Math.round(toE(o.total,o.currency)):0;
-  renderExpSum2(rev);
-}
+function addExpRow(){expRows.push({cat:'Raw materials',desc:'',amount:0});renderExpRows();}
 
 function renderExpSum2(rev){
   const total=expRows.reduce((s,r)=>s+(parseFloat(r.amount)||0),0);
@@ -579,13 +1013,23 @@ function renderExpSum2(rev){
 
 async function saveExp(){
   await api('save-expenses',{orderId:expOrderId,expenses:expRows});
+  logActivity(`Expenses updated for order ${expOrderId}`);
   closeExp();
+}
+
+function convHint(){
+  const a=parseFloat(document.getElementById('oTotal').value)||0;
+  const c=document.getElementById('oCurr').value;
+  document.getElementById('oHint').textContent=c!=='EGP'&&a?'approx EGP '+Math.round(toE(a,c)).toLocaleString():'';
 }
 
 function exportCSV(){
   const dc=document.getElementById('dCurr').value;
-  const h=['Order ID','Date','Client','Products','Amount (original)','Currency','Amount ('+dc+')','Payment','Delivery','Due Date','Follow-up','Notes','Added By'];
-  const rows=orders.map(o=>[o.id,o.date,o.client,o.products,o.total,o.currency,Math.round(frE(egp(o),dc)),o.payment,o.delivery,o.dueDate||'',o.followUp||'',o.notes||'',o.addedBy||''].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+  const h=['Order ID','Date','Client','Products','Amount (original)','Currency','Amount ('+dc+')','Payment','Delivery','Due Date','Follow-up','Notes','Added By','Artisans'];
+  const rows=orders.map(o=>{
+    const artNames=(o.artisans||[]).map(id=>{const a=artisans.find(x=>x.id===id);return a?a.name:'';}).filter(Boolean).join('; ');
+    return [o.id,o.date,o.client,o.products||'',o.total||0,o.currency||'EGP',Math.round(frE(egp(o),dc)),o.payment,o.delivery,o.dueDate||'',o.followUp||'',o.notes||'',o.addedBy||'',artNames].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',');
+  });
   const csv=[h.join(','),...rows].join('\n');
   const blob=new Blob([csv],{type:'text/csv'});
   const url=URL.createObjectURL(blob);
