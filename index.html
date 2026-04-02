@@ -166,6 +166,7 @@ tr.ds td{background:#fffbf4;}
     <div class="tab" id="tArtisans" onclick="showTab('artisans')">Artisans</div>
     <div class="tab" id="tActivity" onclick="showTab('activity')">Activity log</div>
     <div class="tab" id="tImpact" onclick="showTab('impact')">Impact report</div>
+    <div class="tab" id="tClient" onclick="showTab('client')">Client statement</div>
     <div class="tab" id="tTeam" onclick="showTab('team')" style="display:none">Team</div>
   </div>
 
@@ -261,6 +262,17 @@ tr.ds td{background:#fffbf4;}
     <div id="impactContent"></div>
   </div>
 
+  <!-- CLIENT STATEMENT TAB -->
+  <div id="vClient" style="display:none">
+    <div class="tabbar">
+      <span style="font-size:14px;color:#888">View all orders and balance for a client</span>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:1.25rem;flex-wrap:wrap">
+      <input type="text" id="clientSearch" placeholder="Type client name..." oninput="renderClientStatement()" style="flex:1;min-width:200px;margin:0"/>
+    </div>
+    <div id="clientStatementContent"></div>
+  </div>
+
   <!-- TEAM TAB -->
   <div id="vTeam" style="display:none">
     <div class="tabbar">
@@ -282,8 +294,12 @@ tr.ds td{background:#fffbf4;}
   <h3 id="oTitle">New order</h3>
   <div class="slabel">Order details</div>
   <div class="g2">
-    <div><label>Client name</label><input type="text" id="oClient" placeholder="e.g. Noon Egypt"/></div>
+    <div><label>Order ID</label><input type="text" id="oId" placeholder="e.g. YDW-001 or leave blank for auto"/></div>
     <div><label>Order date</label><input type="date" id="oDate"/></div>
+  </div>
+  <div class="g2">
+    <div><label>Client name</label><input type="text" id="oClient" placeholder="e.g. Noon Egypt"/></div>
+    <div></div>
   </div>
   <div class="g2">
     <div><label>Products and quantities</label><input type="text" id="oProducts" placeholder="e.g. Woven basket x10"/></div>
@@ -464,7 +480,7 @@ function sync(s){
 }
 
 function showTab(t){
-  ['Orders','Artisans','Activity','Impact','Team'].forEach(x=>{
+  ['Orders','Artisans','Activity','Impact','Client','Team'].forEach(x=>{
     document.getElementById('v'+x).style.display=t===x.toLowerCase()?'':'none';
     document.getElementById('t'+x).className='tab'+(t===x.toLowerCase()?' on':'');
   });
@@ -814,6 +830,65 @@ function renderImpact(){
   `;
 }
 
+function renderClientStatement(){
+  const q=document.getElementById('clientSearch').value.trim().toLowerCase();
+  const div=document.getElementById('clientStatementContent');
+  if(!q){div.innerHTML='<div class="empty">Type a client name above to view their statement.</div>';return;}
+  const clientOrders=orders.filter(o=>(o.client||'').toLowerCase().includes(q));
+  if(!clientOrders.length){div.innerHTML='<div class="empty">No orders found for "'+q+'".</div>';return;}
+  const clients=[...new Set(clientOrders.map(o=>o.client))];
+  div.innerHTML=clients.map(client=>{
+    const cos=clientOrders.filter(o=>o.client===client);
+    const totalEGP=cos.reduce((s,o)=>s+egp(o),0);
+    const paidEGP=cos.filter(o=>o.payment==='Paid').reduce((s,o)=>s+egp(o),0);
+    const unpaidEGP=cos.filter(o=>o.payment==='Unpaid').reduce((s,o)=>s+egp(o),0);
+    const partialEGP=cos.filter(o=>o.payment==='Partial').reduce((s,o)=>s+egp(o),0);
+    const dc=document.getElementById('dCurr').value;
+    return `
+    <div class="report-section" style="margin-bottom:1.5rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+        <h4 style="font-size:16px">${client}</h4>
+        <button class="btn sm blue" onclick="exportClientCSV('${client.replace(/'/g,"\'")}')">Export CSV</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1rem">
+        <div class="metric"><div class="mlbl">Total orders</div><div class="mval">${cos.length}</div></div>
+        <div class="metric"><div class="mlbl">Total revenue</div><div class="mval g">${f(frE(totalEGP,dc),dc)}</div></div>
+        <div class="metric"><div class="mlbl">Collected</div><div class="mval g">${f(frE(paidEGP,dc),dc)}</div></div>
+        <div class="metric"><div class="mlbl">Outstanding</div><div class="mval r">${f(frE(unpaidEGP+partialEGP,dc),dc)}</div></div>
+      </div>
+      <div class="card"><div class="tscroll">
+      <table>
+        <thead><tr>
+          <th>Order ID</th><th>Date</th><th>Products</th><th>Amount</th><th>Payment</th><th>Delivery</th><th>Due date</th><th>Notes</th>
+        </tr></thead>
+        <tbody>${cos.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(o=>`<tr>
+          <td style="font-family:monospace;font-size:12px;font-weight:500">${o.id}</td>
+          <td style="color:#888;white-space:nowrap">${o.date}</td>
+          <td style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#888" title="${o.products||''}">${o.products||'-'}</td>
+          <td style="font-weight:500;white-space:nowrap">${f(frE(egp(o),dc),dc)}${o.currency!==dc?`<span class="cbadge">${f(o.total,o.currency)}</span>`:''}</td>
+          <td><span class="badge ${PM[o.payment]}">${o.payment}</span></td>
+          <td><span class="badge ${DM[o.delivery]}">${o.delivery}</span></td>
+          <td style="font-size:12px;color:#888">${o.dueDate||'-'}</td>
+          <td style="max-width:120px;font-size:12px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${o.notes||''}">${o.notes||'-'}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+      </div></div>
+    </div>`;
+  }).join('');
+}
+
+function exportClientCSV(client){
+  const dc=document.getElementById('dCurr').value;
+  const cos=orders.filter(o=>o.client===client);
+  const h=['Order ID','Date','Products','Amount (original)','Currency','Amount ('+dc+')','Payment','Delivery','Due Date','Notes'];
+  const rows=cos.map(o=>[o.id,o.date,o.products||'',o.total||0,o.currency||'EGP',Math.round(frE(egp(o),dc)),o.payment,o.delivery,o.dueDate||'',o.notes||''].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+  const csv=[h.join(','),...rows].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=client.replace(/[^a-z0-9]/gi,'_')+'_statement.csv';a.click();
+  URL.revokeObjectURL(url);
+}
+
 function printReport(){
   const content=document.getElementById('printable-report').innerHTML;
   const w=window.open('','_blank');
@@ -848,6 +923,7 @@ function openOrder(id){
   document.getElementById('oTitle').textContent=id?'Edit order':'New order';
   if(id){
     const o=orders.find(x=>x.id===id);
+    document.getElementById('oId').value=o.id||'';
     document.getElementById('oClient').value=o.client||'';
     document.getElementById('oDate').value=o.date||'';
     document.getElementById('oProducts').value=o.products||'';
@@ -863,7 +939,7 @@ function openOrder(id){
     Array.from(sel.options).forEach(opt=>{opt.selected=(o.artisans||[]).includes(opt.value);});
     document.getElementById('oDel3').style.display=cur.role==='manager'?'':'none';
   }else{
-    ['oClient','oProducts','oNotes'].forEach(i=>document.getElementById(i).value='');
+    ['oId','oClient','oProducts','oNotes'].forEach(i=>document.getElementById(i).value='');
     document.getElementById('oDate').value=new Date().toISOString().slice(0,10);
     document.getElementById('oTotal').value='';
     document.getElementById('oCurr').value='EGP';
@@ -882,6 +958,7 @@ function closeOrder(){document.getElementById('oOrder').classList.remove('on');}
 async function saveOrder(){
   const client=document.getElementById('oClient').value.trim();
   const date=document.getElementById('oDate').value;
+  const manualId=document.getElementById('oId').value.trim();
   if(!client||!date)return;
   const selArtisans=Array.from(document.getElementById('oArtisans').selectedOptions).map(o=>o.value);
   const o={
@@ -907,7 +984,14 @@ async function saveOrder(){
     if(old.payment!==o.payment)logActivity(`Order ${editId}: payment changed from ${old.payment} to ${o.payment}`);
     if(old.client!==o.client||old.total!==o.total)logActivity(`Order ${editId}: details updated by ${cur.username}`);
   }else{
-    o.id=nid();orders.unshift(o);
+    // Use manual ID if provided, otherwise auto-generate
+    if(manualId){
+      if(orders.find(x=>x.id===manualId)){alert('Order ID '+manualId+' already exists. Please use a different ID.');return;}
+      o.id=manualId;
+    }else{
+      o.id=nid();
+    }
+    orders.unshift(o);
     logActivity(`New order ${o.id} added for ${client} by ${cur.username}`);
   }
   closeOrder();sync('s');
