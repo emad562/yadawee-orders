@@ -346,8 +346,12 @@ tr.ds td{background:#fffbf4;}
     <div><label>Phone number</label><input type="text" id="aPhone" placeholder="e.g. 010xxxxxxxx"/></div>
   </div>
   <div class="g2">
+    <div><label>LSE (Group)</label><select id="aLse" style="margin-bottom:12px" onchange="handleLseChange(this)"><option value="">-- select group --</option><option>Yadawee's team</option><option>Yadawee - Al Sadu</option><option>Yadawee - NF</option><option>Yadawee - Star</option><option>Yadawee - Drum</option><option>Yadawee - Braclet</option><option>Yadawee - Duma</option><option value="other">Other (type below)</option></select><input type="text" id="aLseCustom" placeholder="Type custom group name..." style="display:none;margin-bottom:12px"/></div>
     <div><label>Craft specialty</label><input type="text" id="aSpecialty" placeholder="e.g. Weaving, Ceramics"/></div>
+  </div>
+  <div class="g2">
     <div><label>Location / governorate</label><input type="text" id="aLocation" placeholder="e.g. Cairo, Aswan"/></div>
+    <div></div>
   </div>
   <div class="g2">
     <div><label>Date joined Yadawee</label><input type="date" id="aJoined"/></div>
@@ -623,10 +627,11 @@ function render(){
 function renderArtisans(){
   const totalWages=artisans.reduce((s,a)=>s+(parseFloat(a.wage)||0),0);
   const specialties=[...new Set(artisans.map(a=>a.specialty).filter(Boolean))];
+  const groups=[...new Set(artisans.map(a=>a.lse).filter(Boolean))];
   document.getElementById('artisanMetrics').innerHTML=`
     <div class="metric"><div class="mlbl">Total artisans</div><div class="mval b">${artisans.length}</div></div>
     <div class="metric"><div class="mlbl">Total monthly wages</div><div class="mval g">EGP ${Math.round(totalWages).toLocaleString()}</div></div>
-    <div class="metric"><div class="mlbl">Craft specialties</div><div class="mval a">${specialties.length}</div></div>
+    <div class="metric"><div class="mlbl">LSE groups</div><div class="mval a">${groups.length}</div></div>
     <div class="metric"><div class="mlbl">Avg monthly wage</div><div class="mval">EGP ${artisans.length?Math.round(totalWages/artisans.length).toLocaleString():0}</div></div>
   `;
   const list=document.getElementById('artisanList');
@@ -636,7 +641,8 @@ function renderArtisans(){
       <div class="artisan-avatar">${(a.name||'?')[0].toUpperCase()}</div>
       <div class="artisan-info">
         <div class="artisan-name">${a.name}</div>
-        <div class="artisan-meta">${[a.specialty,a.location,a.origin,a.gender?(a.gender+(a.age?' · Age '+a.age:'')):a.age?'Age '+a.age:''].filter(Boolean).join(' · ')}</div>
+        <div class="artisan-meta">${a.lse?'<span style="background:#E1F5EE;color:#0F6E56;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:500">'+a.lse+'</span> ':''}</div>
+        <div class="artisan-meta" style="margin-top:3px">${[a.specialty,a.location,a.origin,a.gender?(a.gender+(a.age?' · Age '+a.age:'')):a.age?'Age '+a.age:''].filter(Boolean).join(' · ')}</div>
         <div class="artisan-meta" style="margin-top:4px">${a.phone||''} ${a.wage?'· EGP '+parseFloat(a.wage).toLocaleString()+'/mo':''}</div>
         ${(a.unhcrCase||a.unhcrInd)?`<div class="artisan-meta" style="margin-top:4px">UNHCR Case: ${a.unhcrCase||'-'} · Ind: ${a.unhcrInd||'-'}${a.myr?' · MYR: '+a.myr:''}</div>`:''}
         ${a.notes?`<div class="artisan-meta" style="margin-top:4px;font-style:italic">${a.notes}</div>`:''}
@@ -662,14 +668,29 @@ function openArtisan(id){
     document.getElementById('aNotes').value=a.notes||'';
     document.getElementById('aOrigin').value=a.origin||'';
     document.getElementById('aAge').value=a.age||'';
+    // LSE field
+    const lseOpts=['Yadawee\'s team','Yadawee - Al Sadu','Yadawee - NF','Yadawee - Star','Yadawee - Drum','Yadawee - Braclet','Yadawee - Duma'];
+    if(lseOpts.includes(a.lse||'')){
+      document.getElementById('aLse').value=a.lse||'';
+      document.getElementById('aLseCustom').style.display='none';
+    }else if(a.lse){
+      document.getElementById('aLse').value='other';
+      document.getElementById('aLseCustom').value=a.lse;
+      document.getElementById('aLseCustom').style.display='';
+    }else{
+      document.getElementById('aLse').value='';
+      document.getElementById('aLseCustom').style.display='none';
+    }
     document.getElementById('aUnhcrCase').value=a.unhcrCase||'';
     document.getElementById('aUnhcrInd').value=a.unhcrInd||'';
     document.getElementById('aMyr').value=a.myr||'';
     document.getElementById('aGender').value=a.gender||'';
     document.getElementById('aDelBtn').style.display=cur.role==='manager'?'':'none';
   }else{
-    ['aName','aPhone','aSpecialty','aLocation','aJoined','aWage','aNotes','aUnhcrCase','aUnhcrInd','aMyr','aOrigin','aAge'].forEach(i=>document.getElementById(i).value='');
+    ['aName','aPhone','aSpecialty','aLocation','aJoined','aWage','aNotes','aUnhcrCase','aUnhcrInd','aMyr','aOrigin','aAge','aLseCustom'].forEach(i=>document.getElementById(i).value='');
     document.getElementById('aGender').value='';
+    document.getElementById('aLse').value='';
+    document.getElementById('aLseCustom').style.display='none';
     document.getElementById('aDelBtn').style.display='none';
   }
   document.getElementById('oArtisan').classList.add('on');
@@ -687,6 +708,7 @@ async function saveArtisan(){
     joined:document.getElementById('aJoined').value,
     wage:parseFloat(document.getElementById('aWage').value)||0,
     notes:document.getElementById('aNotes').value.trim(),
+    lse:document.getElementById('aLse').value==='other'?document.getElementById('aLseCustom').value.trim():document.getElementById('aLse').value,
     origin:document.getElementById('aOrigin').value.trim(),
     age:document.getElementById('aAge').value,
     unhcrCase:document.getElementById('aUnhcrCase').value.trim(),
@@ -1160,6 +1182,12 @@ function convHint(){
   document.getElementById('oHint').textContent=c!=='EGP'&&a?'approx EGP '+Math.round(toE(a,c)).toLocaleString():'';
 }
 
+function handleLseChange(sel){
+  const custom=document.getElementById('aLseCustom');
+  if(sel.value==='other'){custom.style.display='';custom.focus();}
+  else{custom.style.display='none';custom.value='';}
+}
+
 let importData=[];
 
 function importArtisans(input){
@@ -1233,6 +1261,7 @@ function importArtisans(input){
         unhcrCase:String(findCol(r,colMap.unhcrCase)||'').trim(),
         unhcrInd:String(findCol(r,colMap.unhcrInd)||'').trim(),
         gender:String(findCol(r,colMap.gender)||'').trim().toUpperCase().slice(0,1),
+        lse:String(findCol(r,['lse','group','team','lse group'])||'').trim(),
         origin:String(findCol(r,['origin','country','country of origin','nationality'])||'').trim(),
         age:String(findCol(r,['age','عمر'])||'').trim(),
         myr:String(findCol(r,['myr','myr no','myr number'])||'').trim(),
