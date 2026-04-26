@@ -134,6 +134,7 @@ tr.ds td{background:#fffbf4;}
 .artisan-meta{font-size:12px;color:#888;}
 .artisan-actions{display:flex;gap:6px;}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -232,7 +233,11 @@ tr.ds td{background:#fffbf4;}
   <div id="vArtisans" style="display:none">
     <div class="tabbar">
       <span style="font-size:14px;color:#888">Track your artisan team</span>
-      <button class="btn green gs" onclick="openArtisan()">+ add artisan</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn blue gs" onclick="document.getElementById('artisanImportFile').click()">&#8593; Import Excel/CSV</button>
+        <input type="file" id="artisanImportFile" accept=".xlsx,.xls,.csv" style="display:none" onchange="importArtisans(this)"/>
+        <button class="btn green gs" onclick="openArtisan()">+ add artisan</button>
+      </div>
     </div>
     <div class="metrics" id="artisanMetrics"></div>
     <div id="artisanList"></div>
@@ -416,6 +421,24 @@ tr.ds td{background:#fffbf4;}
   <div style="display:flex;gap:8px;justify-content:flex-end">
     <button class="btn" onclick="closeConf()">Cancel</button>
     <button class="btn red" onclick="doDelete()">Delete</button>
+  </div>
+</div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div class="overlay" id="oImport">
+<div class="modal" style="max-width:700px">
+  <h3>Import artisans from Excel / CSV</h3>
+  <div style="background:#f5f5f3;border-radius:8px;padding:12px;margin-bottom:1rem;font-size:13px;color:#666">
+    <strong>Expected columns (in any order):</strong><br>
+    Name, Phone, Specialty, Location, Joined (date), Wage, UNHCR Case No, UNHCR Ind No, Gender (M/F), Notes
+  </div>
+  <div id="importPreview" style="max-height:350px;overflow-y:auto"></div>
+  <div class="err" id="importErr"></div>
+  <div class="mfoot">
+    <span id="importCount" style="font-size:13px;color:#888;margin-right:auto"></span>
+    <button class="btn" onclick="closeImport()">Cancel</button>
+    <button class="btn green gs" id="importConfirmBtn" onclick="confirmImport()">Import all</button>
   </div>
 </div>
 </div>
@@ -1119,6 +1142,141 @@ function convHint(){
   const a=parseFloat(document.getElementById('oTotal').value)||0;
   const c=document.getElementById('oCurr').value;
   document.getElementById('oHint').textContent=c!=='EGP'&&a?'approx EGP '+Math.round(toE(a,c)).toLocaleString():'';
+}
+
+let importData=[];
+
+function importArtisans(input){
+  const file=input.files[0];
+  if(!file)return;
+  input.value='';
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      let rows=[];
+      if(file.name.endsWith('.csv')){
+        // Parse CSV
+        const text=e.target.result;
+        const lines=text.split(/\r?\n/).filter(l=>l.trim());
+        const headers=lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());
+        rows=lines.slice(1).map(line=>{
+          const vals=[];
+          let inQuote=false,cur='';
+          for(let ch of line){
+            if(ch==='"'){inQuote=!inQuote;}
+            else if(ch===','&&!inQuote){vals.push(cur.trim());cur='';}
+            else cur+=ch;
+          }
+          vals.push(cur.trim());
+          const obj={};
+          headers.forEach((h,i)=>obj[h]=vals[i]||'');
+          return obj;
+        });
+      }else{
+        // Parse Excel
+        const data=new Uint8Array(e.target.result);
+        const wb=XLSX.read(data,{type:'array'});
+        const ws=wb.Sheets[wb.SheetNames[0]];
+        rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+      }
+
+      // Map columns flexibly
+      const colMap={
+        name:['name','full name','artisan name','اسم'],
+        phone:['phone','phone number','mobile','tel','هاتف'],
+        specialty:['specialty','craft','craft specialty','craft type','تخصص'],
+        location:['location','governorate','city','address','محافظة'],
+        joined:['joined','date joined','join date','start date','تاريخ'],
+        wage:['wage','monthly wage','salary','egp','أجر'],
+        unhcrCase:['unhcr case','unhcr case no','case no','case number','case'],
+        unhcrInd:['unhcr ind','unhcr ind no','ind no','individual no','ind'],
+        gender:['gender','sex','جنس'],
+        notes:['notes','note','remarks','ملاحظات'],
+      };
+
+      function findCol(row, keys){
+        const rowKeys=Object.keys(row).map(k=>k.toLowerCase().trim());
+        for(const k of keys){
+          const idx=rowKeys.findIndex(rk=>rk.includes(k));
+          if(idx>=0)return Object.values(row)[idx];
+        }
+        return '';
+      }
+
+      importData=rows.filter(r=>findCol(r,colMap.name)).map(r=>({
+        id:'ART-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),
+        name:String(findCol(r,colMap.name)||'').trim(),
+        phone:String(findCol(r,colMap.phone)||'').trim(),
+        specialty:String(findCol(r,colMap.specialty)||'').trim(),
+        location:String(findCol(r,colMap.location)||'').trim(),
+        joined:String(findCol(r,colMap.joined)||'').trim(),
+        wage:parseFloat(findCol(r,colMap.wage))||0,
+        unhcrCase:String(findCol(r,colMap.unhcrCase)||'').trim(),
+        unhcrInd:String(findCol(r,colMap.unhcrInd)||'').trim(),
+        gender:String(findCol(r,colMap.gender)||'').trim().toUpperCase().slice(0,1),
+        notes:String(findCol(r,colMap.notes)||'').trim(),
+      }));
+
+      if(!importData.length){
+        document.getElementById('importErr').textContent='No valid rows found. Make sure the file has a Name column.';
+        document.getElementById('oImport').classList.add('on');
+        return;
+      }
+
+      // Show preview
+      document.getElementById('importCount').textContent=importData.length+' artisans ready to import';
+      document.getElementById('importErr').textContent='';
+      document.getElementById('importPreview').innerHTML=`
+        <table style="width:100%;font-size:12px;border-collapse:collapse">
+          <thead><tr style="background:#fafaf8;border-bottom:1px solid #e8e8e4">
+            <th style="padding:6px;text-align:left">Name</th>
+            <th style="padding:6px;text-align:left">Phone</th>
+            <th style="padding:6px;text-align:left">Specialty</th>
+            <th style="padding:6px;text-align:left">Location</th>
+            <th style="padding:6px;text-align:left">Wage</th>
+            <th style="padding:6px;text-align:left">Gender</th>
+            <th style="padding:6px;text-align:left">UNHCR Case</th>
+            <th style="padding:6px;text-align:left">UNHCR Ind</th>
+          </tr></thead>
+          <tbody>${importData.map(a=>`<tr style="border-bottom:1px solid #f0f0ec">
+            <td style="padding:6px;font-weight:500">${a.name}</td>
+            <td style="padding:6px;color:#888">${a.phone||'-'}</td>
+            <td style="padding:6px;color:#888">${a.specialty||'-'}</td>
+            <td style="padding:6px;color:#888">${a.location||'-'}</td>
+            <td style="padding:6px;color:#888">${a.wage?'EGP '+a.wage.toLocaleString():'-'}</td>
+            <td style="padding:6px;color:#888">${a.gender||'-'}</td>
+            <td style="padding:6px;color:#888">${a.unhcrCase||'-'}</td>
+            <td style="padding:6px;color:#888">${a.unhcrInd||'-'}</td>
+          </tr>`).join('')}</tbody>
+        </table>`;
+      document.getElementById('oImport').classList.add('on');
+    }catch(err){
+      alert('Error reading file: '+err.message);
+    }
+  };
+  if(file.name.endsWith('.csv')){reader.readAsText(file);}
+  else{reader.readAsArrayBuffer(file);}
+}
+
+function closeImport(){
+  document.getElementById('oImport').classList.remove('on');
+  importData=[];
+}
+
+async function confirmImport(){
+  if(!importData.length)return;
+  // Skip duplicates by name
+  const existing=new Set(artisans.map(a=>a.name.toLowerCase()));
+  const newOnes=importData.filter(a=>!existing.has(a.name.toLowerCase()));
+  const dupes=importData.length-newOnes.length;
+  artisans=[...artisans,...newOnes];
+  closeImport();
+  logActivity(`Imported ${newOnes.length} artisans${dupes>0?' ('+dupes+' duplicates skipped)':''}`);
+  sync('s');
+  await api('save-artisans',{artisans});
+  sync('ok');
+  showTab('artisans');
+  alert(`Successfully imported ${newOnes.length} artisans!${dupes>0?' '+dupes+' duplicates were skipped.':''}`);
 }
 
 function exportCSV(){
