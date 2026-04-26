@@ -367,9 +367,6 @@ tr.ds td{background:#fffbf4;}
     <div></div>
   </div>
   <div class="g3">
-    <div><label>Country of origin</label><input type="text" id="aOrigin" placeholder="e.g. Syria, Sudan"/></div>
-    <div><label>Age</label><input type="number" id="aAge" placeholder="e.g. 32" min="1" max="99"/></div>
-    <div><label>MYR status</label><select id="aMyr" style="margin-bottom:12px"><option value="">-- select --</option><option value="Yes">Yes - Open case</option><option value="No">No</option></select></div>
   </div>
   <label>Notes</label>
   <textarea id="aNotes" placeholder="e.g. Part time, works 2 weeks per month..."></textarea>
@@ -642,7 +639,6 @@ function renderArtisans(){
         <div class="artisan-meta">${[a.specialty,a.location,a.origin,a.gender?(a.gender+(a.age?' · Age '+a.age:'')):a.age?'Age '+a.age:''].filter(Boolean).join(' · ')}</div>
         <div class="artisan-meta" style="margin-top:4px">${a.phone||''} ${a.wage?'· EGP '+parseFloat(a.wage).toLocaleString()+'/mo':''}</div>
         ${(a.unhcrCase||a.unhcrInd)?`<div class="artisan-meta" style="margin-top:4px">UNHCR Case: ${a.unhcrCase||'-'} · Ind: ${a.unhcrInd||'-'}${a.myr?' · MYR: '+a.myr:''}</div>`:''}
-        ${(a.origin||a.age)?`<div class="artisan-meta" style="margin-top:4px">${[a.origin,a.age?'Age: '+a.age:''].filter(Boolean).join(' · ')}</div>`:''}
         ${a.notes?`<div class="artisan-meta" style="margin-top:4px;font-style:italic">${a.notes}</div>`:''}
       </div>
       <div class="artisan-actions">
@@ -670,14 +666,10 @@ function openArtisan(id){
     document.getElementById('aUnhcrInd').value=a.unhcrInd||'';
     document.getElementById('aMyr').value=a.myr||'';
     document.getElementById('aGender').value=a.gender||'';
-    document.getElementById('aOrigin').value=a.origin||'';
-    document.getElementById('aAge').value=a.age||'';
-    document.getElementById('aMyr').value=a.myr||'';
     document.getElementById('aDelBtn').style.display=cur.role==='manager'?'':'none';
   }else{
     ['aName','aPhone','aSpecialty','aLocation','aJoined','aWage','aNotes','aUnhcrCase','aUnhcrInd','aMyr','aOrigin','aAge'].forEach(i=>document.getElementById(i).value='');
     document.getElementById('aGender').value='';
-    document.getElementById('aMyr').value='';
     document.getElementById('aDelBtn').style.display='none';
   }
   document.getElementById('oArtisan').classList.add('on');
@@ -701,9 +693,6 @@ async function saveArtisan(){
     unhcrInd:document.getElementById('aUnhcrInd').value.trim(),
     myr:document.getElementById('aMyr').value.trim(),
     gender:document.getElementById('aGender').value,
-    origin:document.getElementById('aOrigin').value.trim(),
-    age:document.getElementById('aAge').value.trim(),
-    myr:document.getElementById('aMyr').value,
   };
   if(editArtisanId){
     const i=artisans.findIndex(x=>x.id===editArtisanId);
