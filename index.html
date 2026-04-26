@@ -353,10 +353,23 @@ tr.ds td{background:#fffbf4;}
     <div><label>Date joined Yadawee</label><input type="date" id="aJoined"/></div>
     <div><label>Monthly wage (EGP)</label><input type="number" id="aWage" placeholder="0"/></div>
   </div>
+  <div class="g2">
+    <div><label>Country of origin</label><input type="text" id="aOrigin" placeholder="e.g. Sudan, Syria"/></div>
+    <div><label>Age</label><input type="number" id="aAge" placeholder="e.g. 32" min="1" max="120"/></div>
+  </div>
   <div class="g3">
     <div><label>UNHCR Case No.</label><input type="text" id="aUnhcrCase" placeholder="e.g. 123456"/></div>
     <div><label>UNHCR Ind. No.</label><input type="text" id="aUnhcrInd" placeholder="e.g. 001"/></div>
+    <div><label>MYR</label><input type="text" id="aMyr" placeholder="UNHCR MYR field"/></div>
+  </div>
+  <div class="g2">
     <div><label>Gender</label><select id="aGender" style="margin-bottom:12px"><option value="">-- select --</option><option value="F">F - Female</option><option value="M">M - Male</option></select></div>
+    <div></div>
+  </div>
+  <div class="g3">
+    <div><label>Country of origin</label><input type="text" id="aOrigin" placeholder="e.g. Syria, Sudan"/></div>
+    <div><label>Age</label><input type="number" id="aAge" placeholder="e.g. 32" min="1" max="99"/></div>
+    <div><label>MYR status</label><select id="aMyr" style="margin-bottom:12px"><option value="">-- select --</option><option value="Yes">Yes - Open case</option><option value="No">No</option></select></div>
   </div>
   <label>Notes</label>
   <textarea id="aNotes" placeholder="e.g. Part time, works 2 weeks per month..."></textarea>
@@ -626,9 +639,10 @@ function renderArtisans(){
       <div class="artisan-avatar">${(a.name||'?')[0].toUpperCase()}</div>
       <div class="artisan-info">
         <div class="artisan-name">${a.name}</div>
-        <div class="artisan-meta">${[a.specialty,a.location,a.gender].filter(Boolean).join(' · ')}</div>
+        <div class="artisan-meta">${[a.specialty,a.location,a.origin,a.gender?(a.gender+(a.age?' · Age '+a.age:'')):a.age?'Age '+a.age:''].filter(Boolean).join(' · ')}</div>
         <div class="artisan-meta" style="margin-top:4px">${a.phone||''} ${a.wage?'· EGP '+parseFloat(a.wage).toLocaleString()+'/mo':''}</div>
-        ${(a.unhcrCase||a.unhcrInd)?`<div class="artisan-meta" style="margin-top:4px">UNHCR Case: ${a.unhcrCase||'-'} · Ind: ${a.unhcrInd||'-'}</div>`:''}
+        ${(a.unhcrCase||a.unhcrInd)?`<div class="artisan-meta" style="margin-top:4px">UNHCR Case: ${a.unhcrCase||'-'} · Ind: ${a.unhcrInd||'-'}${a.myr?' · MYR: '+a.myr:''}</div>`:''}
+        ${(a.origin||a.age)?`<div class="artisan-meta" style="margin-top:4px">${[a.origin,a.age?'Age: '+a.age:''].filter(Boolean).join(' · ')}</div>`:''}
         ${a.notes?`<div class="artisan-meta" style="margin-top:4px;font-style:italic">${a.notes}</div>`:''}
       </div>
       <div class="artisan-actions">
@@ -650,13 +664,20 @@ function openArtisan(id){
     document.getElementById('aJoined').value=a.joined||'';
     document.getElementById('aWage').value=a.wage||'';
     document.getElementById('aNotes').value=a.notes||'';
+    document.getElementById('aOrigin').value=a.origin||'';
+    document.getElementById('aAge').value=a.age||'';
     document.getElementById('aUnhcrCase').value=a.unhcrCase||'';
     document.getElementById('aUnhcrInd').value=a.unhcrInd||'';
+    document.getElementById('aMyr').value=a.myr||'';
     document.getElementById('aGender').value=a.gender||'';
+    document.getElementById('aOrigin').value=a.origin||'';
+    document.getElementById('aAge').value=a.age||'';
+    document.getElementById('aMyr').value=a.myr||'';
     document.getElementById('aDelBtn').style.display=cur.role==='manager'?'':'none';
   }else{
-    ['aName','aPhone','aSpecialty','aLocation','aJoined','aWage','aNotes','aUnhcrCase','aUnhcrInd'].forEach(i=>document.getElementById(i).value='');
+    ['aName','aPhone','aSpecialty','aLocation','aJoined','aWage','aNotes','aUnhcrCase','aUnhcrInd','aMyr','aOrigin','aAge'].forEach(i=>document.getElementById(i).value='');
     document.getElementById('aGender').value='';
+    document.getElementById('aMyr').value='';
     document.getElementById('aDelBtn').style.display='none';
   }
   document.getElementById('oArtisan').classList.add('on');
@@ -674,9 +695,15 @@ async function saveArtisan(){
     joined:document.getElementById('aJoined').value,
     wage:parseFloat(document.getElementById('aWage').value)||0,
     notes:document.getElementById('aNotes').value.trim(),
+    origin:document.getElementById('aOrigin').value.trim(),
+    age:document.getElementById('aAge').value,
     unhcrCase:document.getElementById('aUnhcrCase').value.trim(),
     unhcrInd:document.getElementById('aUnhcrInd').value.trim(),
+    myr:document.getElementById('aMyr').value.trim(),
     gender:document.getElementById('aGender').value,
+    origin:document.getElementById('aOrigin').value.trim(),
+    age:document.getElementById('aAge').value.trim(),
+    myr:document.getElementById('aMyr').value,
   };
   if(editArtisanId){
     const i=artisans.findIndex(x=>x.id===editArtisanId);
@@ -1192,6 +1219,9 @@ function importArtisans(input){
         unhcrInd:['unhcr ind','unhcr ind no','ind no','individual no','ind'],
         gender:['gender','sex','جنس'],
         notes:['notes','note','remarks','ملاحظات'],
+        origin:['origin','country','country of origin','nationality','بلد'],
+        age:['age','عمر'],
+        myr:['myr','myr status','open case'],
       };
 
       function findCol(row, keys){
@@ -1214,7 +1244,13 @@ function importArtisans(input){
         unhcrCase:String(findCol(r,colMap.unhcrCase)||'').trim(),
         unhcrInd:String(findCol(r,colMap.unhcrInd)||'').trim(),
         gender:String(findCol(r,colMap.gender)||'').trim().toUpperCase().slice(0,1),
+        origin:String(findCol(r,['origin','country','country of origin','nationality'])||'').trim(),
+        age:String(findCol(r,['age','عمر'])||'').trim(),
+        myr:String(findCol(r,['myr','myr no','myr number'])||'').trim(),
         notes:String(findCol(r,colMap.notes)||'').trim(),
+        origin:String(findCol(r,colMap.origin)||'').trim(),
+        age:String(findCol(r,colMap.age)||'').trim(),
+        myr:String(findCol(r,colMap.myr)||'').trim(),
       }));
 
       if(!importData.length){
