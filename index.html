@@ -348,6 +348,11 @@ tr.ds td{background:#fffbf4;}
     <div><label>Date joined Yadawee</label><input type="date" id="aJoined"/></div>
     <div><label>Monthly wage (EGP)</label><input type="number" id="aWage" placeholder="0"/></div>
   </div>
+  <div class="g3">
+    <div><label>UNHCR Case No.</label><input type="text" id="aUnhcrCase" placeholder="e.g. 123456"/></div>
+    <div><label>UNHCR Ind. No.</label><input type="text" id="aUnhcrInd" placeholder="e.g. 001"/></div>
+    <div><label>Gender</label><select id="aGender" style="margin-bottom:12px"><option value="">-- select --</option><option value="F">F - Female</option><option value="M">M - Male</option></select></div>
+  </div>
   <label>Notes</label>
   <textarea id="aNotes" placeholder="e.g. Part time, works 2 weeks per month..."></textarea>
   <div class="mfoot">
@@ -598,8 +603,9 @@ function renderArtisans(){
       <div class="artisan-avatar">${(a.name||'?')[0].toUpperCase()}</div>
       <div class="artisan-info">
         <div class="artisan-name">${a.name}</div>
-        <div class="artisan-meta">${[a.specialty,a.location].filter(Boolean).join(' · ')}</div>
+        <div class="artisan-meta">${[a.specialty,a.location,a.gender].filter(Boolean).join(' · ')}</div>
         <div class="artisan-meta" style="margin-top:4px">${a.phone||''} ${a.wage?'· EGP '+parseFloat(a.wage).toLocaleString()+'/mo':''}</div>
+        ${(a.unhcrCase||a.unhcrInd)?`<div class="artisan-meta" style="margin-top:4px">UNHCR Case: ${a.unhcrCase||'-'} · Ind: ${a.unhcrInd||'-'}</div>`:''}
         ${a.notes?`<div class="artisan-meta" style="margin-top:4px;font-style:italic">${a.notes}</div>`:''}
       </div>
       <div class="artisan-actions">
@@ -621,9 +627,13 @@ function openArtisan(id){
     document.getElementById('aJoined').value=a.joined||'';
     document.getElementById('aWage').value=a.wage||'';
     document.getElementById('aNotes').value=a.notes||'';
+    document.getElementById('aUnhcrCase').value=a.unhcrCase||'';
+    document.getElementById('aUnhcrInd').value=a.unhcrInd||'';
+    document.getElementById('aGender').value=a.gender||'';
     document.getElementById('aDelBtn').style.display=cur.role==='manager'?'':'none';
   }else{
-    ['aName','aPhone','aSpecialty','aLocation','aJoined','aWage','aNotes'].forEach(i=>document.getElementById(i).value='');
+    ['aName','aPhone','aSpecialty','aLocation','aJoined','aWage','aNotes','aUnhcrCase','aUnhcrInd'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('aGender').value='';
     document.getElementById('aDelBtn').style.display='none';
   }
   document.getElementById('oArtisan').classList.add('on');
@@ -641,6 +651,9 @@ async function saveArtisan(){
     joined:document.getElementById('aJoined').value,
     wage:parseFloat(document.getElementById('aWage').value)||0,
     notes:document.getElementById('aNotes').value.trim(),
+    unhcrCase:document.getElementById('aUnhcrCase').value.trim(),
+    unhcrInd:document.getElementById('aUnhcrInd').value.trim(),
+    gender:document.getElementById('aGender').value,
   };
   if(editArtisanId){
     const i=artisans.findIndex(x=>x.id===editArtisanId);
