@@ -239,6 +239,17 @@ tr.ds td{background:#fffbf4;}
         <button class="btn green gs" onclick="openArtisan()">+ add artisan</button>
       </div>
     </div>
+    <div class="filters" style="margin-bottom:1rem">
+      <input type="text" id="artisanSearch" placeholder="Search artisan by name..." oninput="renderArtisans()" style="margin:0;flex:2"/>
+      <select id="artisanLseFilter" onchange="renderArtisans()" style="margin:0;flex:1">
+        <option value="">All LSE groups</option>
+      </select>
+      <select id="artisanGenderFilter" onchange="renderArtisans()" style="margin:0;flex:1">
+        <option value="">All genders</option>
+        <option value="F">Female (F)</option>
+        <option value="M">Male (M)</option>
+      </select>
+    </div>
     <div class="metrics" id="artisanMetrics"></div>
     <div id="artisanList"></div>
   </div>
@@ -637,17 +648,38 @@ function render(){
 // ARTISANS
 function renderArtisans(){
   const totalWages=artisans.filter(a=>a.wageType!=='per_piece').reduce((s,a)=>s+(parseFloat(a.wage)||0),0);
-  const specialties=[...new Set(artisans.map(a=>a.specialty).filter(Boolean))];
-  const groups=[...new Set(artisans.map(a=>a.lse).filter(Boolean))];
+  const groups=[...new Set(artisans.map(a=>a.lse).filter(Boolean))].sort();
+
+  // Populate LSE filter dropdown
+  const lseSel=document.getElementById('artisanLseFilter');
+  if(lseSel){
+    const currentVal=lseSel.value;
+    lseSel.innerHTML='<option value="">All LSE groups ('+artisans.length+')</option>'+
+      groups.map(g=>`<option value="${g}">${g} (${artisans.filter(a=>a.lse===g).length})</option>`).join('');
+    lseSel.value=currentVal;
+  }
+
+  // Apply filters
+  const q=((document.getElementById('artisanSearch')||{}).value||'').toLowerCase();
+  const lseF=(document.getElementById('artisanLseFilter')||{}).value||'';
+  const genderF=(document.getElementById('artisanGenderFilter')||{}).value||'';
+  const filtered=artisans.filter(a=>{
+    if(q&&!(a.name||'').toLowerCase().includes(q))return false;
+    if(lseF&&a.lse!==lseF)return false;
+    if(genderF&&a.gender!==genderF)return false;
+    return true;
+  });
+
   document.getElementById('artisanMetrics').innerHTML=`
     <div class="metric"><div class="mlbl">Total artisans</div><div class="mval b">${artisans.length}</div></div>
-    <div class="metric"><div class="mlbl">Total monthly wages</div><div class="mval g">EGP ${Math.round(totalWages).toLocaleString()}</div></div>
+    <div class="metric"><div class="mlbl">Showing</div><div class="mval b">${filtered.length}</div></div>
     <div class="metric"><div class="mlbl">LSE groups</div><div class="mval a">${groups.length}</div></div>
-    <div class="metric"><div class="mlbl">Avg monthly wage</div><div class="mval">EGP ${artisans.length?Math.round(totalWages/artisans.length).toLocaleString():0}</div></div>
+    <div class="metric"><div class="mlbl">Total monthly wages</div><div class="mval g">EGP ${Math.round(totalWages).toLocaleString()}</div></div>
   `;
   const list=document.getElementById('artisanList');
   if(!artisans.length){list.innerHTML='<div class="empty">No artisans added yet. Click above to add your first artisan.</div>';return;}
-  list.innerHTML=artisans.map(a=>`
+  if(!filtered.length){list.innerHTML='<div class="empty">No artisans match your search.</div>';return;}
+  list.innerHTML=filtered.map(a=>`
     <div class="artisan-card">
       <div class="artisan-avatar">${(a.name||'?')[0].toUpperCase()}</div>
       <div class="artisan-info">
