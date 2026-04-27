@@ -359,7 +359,14 @@ tr.ds td{background:#fffbf4;}
   </div>
   <div class="g2">
     <div><label>Date joined Yadawee</label><input type="date" id="aJoined"/></div>
-    <div><label>Monthly wage (EGP)</label><input type="number" id="aWage" placeholder="0"/></div>
+    <div>
+      <label>Wage type</label>
+      <select id="aWageType" style="margin-bottom:6px" onchange="updateWageLabel()">
+        <option value="monthly">Monthly wage (EGP)</option>
+        <option value="per_piece">Per piece (EGP)</option>
+      </select>
+      <input type="number" id="aWage" placeholder="0" style="margin-bottom:12px"/>
+    </div>
   </div>
   <div class="g2">
     <div><label>Country of origin</label><input type="text" id="aOrigin" placeholder="e.g. Sudan, Syria"/></div>
@@ -629,7 +636,7 @@ function render(){
 
 // ARTISANS
 function renderArtisans(){
-  const totalWages=artisans.reduce((s,a)=>s+(parseFloat(a.wage)||0),0);
+  const totalWages=artisans.filter(a=>a.wageType!=='per_piece').reduce((s,a)=>s+(parseFloat(a.wage)||0),0);
   const specialties=[...new Set(artisans.map(a=>a.specialty).filter(Boolean))];
   const groups=[...new Set(artisans.map(a=>a.lse).filter(Boolean))];
   document.getElementById('artisanMetrics').innerHTML=`
@@ -647,7 +654,7 @@ function renderArtisans(){
         <div class="artisan-name">${a.name}</div>
         <div class="artisan-meta">${a.lse?'<span style="background:#E1F5EE;color:#0F6E56;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:500">'+a.lse+'</span> ':''}</div>
         <div class="artisan-meta" style="margin-top:3px">${[a.specialty,a.location,a.origin,a.gender?(a.gender+(a.age?' · Age '+a.age:'')):a.age?'Age '+a.age:''].filter(Boolean).join(' · ')}</div>
-        <div class="artisan-meta" style="margin-top:4px">${a.phone||''} ${a.wage?'· EGP '+parseFloat(a.wage).toLocaleString()+'/mo':''}</div>
+        <div class="artisan-meta" style="margin-top:4px">${a.phone||''} ${a.wage?'· EGP '+parseFloat(a.wage).toLocaleString()+(a.wageType==='per_piece'?'/piece':'/mo'):''}</div>
         ${(a.unhcrCase||a.unhcrInd)?`<div class="artisan-meta" style="margin-top:4px">UNHCR Case: ${a.unhcrCase||'-'} · Ind: ${a.unhcrInd||'-'}${a.myr?' · MYR: '+a.myr:''}</div>`:''}
         ${a.notes?`<div class="artisan-meta" style="margin-top:4px;font-style:italic">${a.notes}</div>`:''}
       </div>
@@ -668,6 +675,7 @@ function openArtisan(id){
     document.getElementById('aSpecialty').value=a.specialty||'';
     document.getElementById('aLocation').value=a.location||'';
     document.getElementById('aJoined').value=a.joined||'';
+    document.getElementById('aWageType').value=a.wageType||'monthly';
     document.getElementById('aWage').value=a.wage||'';
     document.getElementById('aNotes').value=a.notes||'';
     document.getElementById('aOrigin').value=a.origin||'';
@@ -692,6 +700,7 @@ function openArtisan(id){
     document.getElementById('aDelBtn').style.display=cur.role==='manager'?'':'none';
   }else{
     ['aName','aPhone','aSpecialty','aLocation','aJoined','aWage','aNotes','aUnhcrCase','aUnhcrInd','aMyr','aOrigin','aAge','aLseCustom'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('aWageType').value='monthly';
     document.getElementById('aGender').value='';
     document.getElementById('aLse').value='';
     document.getElementById('aLseCustom').style.display='none';
@@ -711,6 +720,7 @@ async function saveArtisan(){
     location:document.getElementById('aLocation').value.trim(),
     joined:document.getElementById('aJoined').value,
     wage:parseFloat(document.getElementById('aWage').value)||0,
+    wageType:document.getElementById('aWageType').value,
     notes:document.getElementById('aNotes').value.trim(),
     lse:document.getElementById('aLse').value==='other'?document.getElementById('aLseCustom').value.trim():document.getElementById('aLse').value,
     origin:document.getElementById('aOrigin').value.trim(),
@@ -828,7 +838,7 @@ function renderImpact(){
   const delivered=monthOrders.filter(o=>o.delivery==='Delivered');
   const revenue=monthOrders.reduce((s,o)=>s+egp(o),0);
   const paid=monthOrders.filter(o=>o.payment==='Paid').reduce((s,o)=>s+egp(o),0);
-  const totalWages=artisans.reduce((s,a)=>s+(parseFloat(a.wage)||0),0);
+  const totalWages=artisans.filter(a=>a.wageType!=='per_piece').reduce((s,a)=>s+(parseFloat(a.wage)||0),0);
   const wagesPct=revenue>0?Math.round((totalWages/revenue)*100):0;
   const monthName=new Date(yr,mo-1,1).toLocaleString('en-GB',{month:'long',year:'numeric'});
 
@@ -1200,6 +1210,10 @@ function convHint(){
   const a=parseFloat(document.getElementById('oTotal').value)||0;
   const c=document.getElementById('oCurr').value;
   document.getElementById('oHint').textContent=c!=='EGP'&&a?'approx EGP '+Math.round(toE(a,c)).toLocaleString():'';
+}
+
+function updateWageLabel(){
+  // No label change needed - select already shows type
 }
 
 function handleLseChange(sel){
