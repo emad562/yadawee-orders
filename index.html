@@ -310,8 +310,12 @@ tr.ds td{background:#fffbf4;}
     <div><label>Products and quantities</label><input type="text" id="oProducts" placeholder="e.g. Woven basket x10"/></div>
     <div>
       <label>Assigned artisans</label>
-      <select id="oArtisans" multiple style="height:70px;margin-bottom:12px">
+      <select id="oLseFilter" onchange="filterArtisansByLse()" style="margin-bottom:6px">
+        <option value="">All LSE groups</option>
       </select>
+      <select id="oArtisans" multiple style="height:100px;margin-bottom:12px">
+      </select>
+      <div style="font-size:11px;color:#aaa;margin-top:-8px;margin-bottom:12px">Hold Ctrl to select multiple artisans</div>
     </div>
   </div>
   <div class="g21">
@@ -987,8 +991,24 @@ function printReport(){
 
 // ORDER MODAL
 function populateArtisanSelect(){
+  // Populate LSE filter
+  const groups=[...new Set(artisans.map(a=>a.lse).filter(Boolean))].sort();
+  const lseFilter=document.getElementById('oLseFilter');
+  lseFilter.innerHTML='<option value="">All LSE groups ('+artisans.length+')</option>'+
+    groups.map(g=>`<option value="${g}">${g} (${artisans.filter(a=>a.lse===g).length})</option>`).join('');
+  // Populate artisans list
+  filterArtisansByLse();
+}
+
+function filterArtisansByLse(){
+  const group=document.getElementById('oLseFilter').value;
   const sel=document.getElementById('oArtisans');
-  sel.innerHTML=artisans.map(a=>`<option value="${a.id}">${a.name}${a.specialty?' ('+a.specialty+')':''}</option>`).join('');
+  // Remember currently selected
+  const selected=Array.from(sel.selectedOptions).map(o=>o.value);
+  const filtered=group?artisans.filter(a=>a.lse===group):artisans;
+  sel.innerHTML=filtered.map(a=>`<option value="${a.id}">${a.name}${a.lse&&!group?' ['+a.lse+']':''}</option>`).join('');
+  // Restore selections
+  Array.from(sel.options).forEach(opt=>{opt.selected=selected.includes(opt.value);});
 }
 
 function openOrder(id){
