@@ -885,10 +885,10 @@ function renderImpact(){
       <div class="impact-grid">
         <div class="impact-card"><div class="il">Total orders</div><div class="iv">${monthOrders.length}</div></div>
         <div class="impact-card"><div class="il">Orders delivered</div><div class="iv">${delivered.length}</div></div>
-        <div class="impact-card"><div class="il">Revenue (EGP)</div><div class="iv g">EGP ${Math.round(revenue).toLocaleString()}</div></div>
-        <div class="impact-card"><div class="il">Revenue collected</div><div class="iv g">EGP ${Math.round(paid).toLocaleString()}</div></div>
         <div class="impact-card"><div class="il">Active artisans</div><div class="iv b">${artisans.length}</div></div>
-        <div class="impact-card"><div class="il">Total artisan wages</div><div class="iv a">EGP ${Math.round(totalWages).toLocaleString()}</div></div>
+        <div class="impact-card"><div class="il">Monthly wage artisans</div><div class="iv a">${artisans.filter(a=>a.wageType!=='per_piece').length}</div></div>
+        <div class="impact-card"><div class="il">Per piece artisans</div><div class="iv a">${artisans.filter(a=>a.wageType==='per_piece').length}</div></div>
+        <div class="impact-card"><div class="il">Total monthly wages</div><div class="iv g">EGP ${Math.round(totalWages).toLocaleString()}</div></div>
       </div>
 
       <div class="report-section">
@@ -911,13 +911,13 @@ function renderImpact(){
             <th style="text-align:left;padding:6px;font-weight:500;color:#888">Name</th>
             <th style="text-align:left;padding:6px;font-weight:500;color:#888">Specialty</th>
             <th style="text-align:left;padding:6px;font-weight:500;color:#888">Location</th>
-            <th style="text-align:right;padding:6px;font-weight:500;color:#888">Monthly wage</th>
+            <th style="text-align:right;padding:6px;font-weight:500;color:#888">Wage</th>
           </tr></thead>
           <tbody>${artisans.map(a=>`<tr style="border-bottom:1px solid #f0f0ec">
             <td style="padding:6px">${a.name}</td>
             <td style="padding:6px;color:#888">${a.specialty||'-'}</td>
             <td style="padding:6px;color:#888">${a.location||'-'}</td>
-            <td style="padding:6px;text-align:right">EGP ${(parseFloat(a.wage)||0).toLocaleString()}</td>
+            <td style="padding:6px;text-align:right">${(parseFloat(a.wage)||0)?'EGP '+(parseFloat(a.wage)||0).toLocaleString()+(a.wageType==='per_piece'?'/piece':'/mo'):'-'}</td>
           </tr>`).join('')}</tbody>
         </table>`:'<div style="color:#888;font-size:13px">No artisans added yet.</div>'}
       </div>
