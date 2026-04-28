@@ -650,6 +650,10 @@ function render(){
 // ARTISANS
 function renderArtisans(){
   const totalWages=artisans.filter(a=>a.wageType!=='per_piece').reduce((s,a)=>s+(parseFloat(a.wage)||0),0);
+  const actualWagesPaid=monthOrders.reduce((s,o)=>{
+    const wages=o.artisanWages||{};
+    return s+Object.values(wages).reduce((ws,w)=>ws+(parseFloat(w)||0),0);
+  },0);
   const groups=[...new Set(artisans.map(a=>a.lse).filter(Boolean))].sort();
 
   // Populate LSE filter dropdown
@@ -874,6 +878,10 @@ function renderImpact(){
   const revenue=monthOrders.reduce((s,o)=>s+egp(o),0);
   const paid=monthOrders.filter(o=>o.payment==='Paid').reduce((s,o)=>s+egp(o),0);
   const totalWages=artisans.filter(a=>a.wageType!=='per_piece').reduce((s,a)=>s+(parseFloat(a.wage)||0),0);
+  const actualWagesPaid=monthOrders.reduce((s,o)=>{
+    const wages=o.artisanWages||{};
+    return s+Object.values(wages).reduce((ws,w)=>ws+(parseFloat(w)||0),0);
+  },0);
   const wagesPct=revenue>0?Math.round((totalWages/revenue)*100):0;
   const monthName=new Date(yr,mo-1,1).toLocaleString('en-GB',{month:'long',year:'numeric'});
 
@@ -891,7 +899,7 @@ function renderImpact(){
         <div class="impact-card"><div class="il">Active artisans</div><div class="iv b">${artisans.length}</div></div>
         <div class="impact-card"><div class="il">Monthly wage artisans</div><div class="iv a">${artisans.filter(a=>a.wageType!=='per_piece').length}</div></div>
         <div class="impact-card"><div class="il">Per piece artisans</div><div class="iv a">${artisans.filter(a=>a.wageType==='per_piece').length}</div></div>
-        <div class="impact-card"><div class="il">Total monthly wages</div><div class="iv g">EGP ${Math.round(totalWages).toLocaleString()}</div></div>
+        <div class="impact-card"><div class="il">Wages paid this month</div><div class="iv g">EGP ${Math.round(actualWagesPaid).toLocaleString()}</div></div>
       </div>
 
       <div class="report-section">
@@ -958,7 +966,7 @@ function renderImpact(){
               <th style="text-align:left;padding:6px;font-weight:500;color:#888">Name</th>
               <th style="text-align:left;padding:6px;font-weight:500;color:#888">LSE Group</th>
               <th style="text-align:left;padding:6px;font-weight:500;color:#888">Orders</th>
-              <th style="text-align:left;padding:6px;font-weight:500;color:#888">Wage type</th>
+              <th style="text-align:left;padding:6px;font-weight:500;color:#888">Total paid (EGP)</th>
             </tr></thead>
             <tbody>${assignedArtisans.map(a=>{
               const artOrders=monthOrders.filter(o=>o.artisans&&o.artisans.includes(a.id));
@@ -966,7 +974,10 @@ function renderImpact(){
                 <td style="padding:6px">${a.name}</td>
                 <td style="padding:6px;color:#888">${a.lse||'-'}</td>
                 <td style="padding:6px;color:#888">${artOrders.map(o=>o.id).join(', ')}</td>
-                <td style="padding:6px;color:#888">${a.wageType==='per_piece'?'Per piece':'Monthly'}</td>
+                <td style="padding:6px;color:#888">${(()=>{
+                  const totalPaid=artOrders.reduce((s,o)=>s+((o.artisanWages&&o.artisanWages[a.id])||0),0);
+                  return totalPaid?'EGP '+totalPaid.toLocaleString():'Not entered';
+                })()}</td>
               </tr>`;
             }).join('')}</tbody>
           </table>`;
@@ -1063,6 +1074,7 @@ function printReport(){
 
 // ORDER MODAL
 let selectedArtisanIds=[];
+let selectedArtisanWages={};  // {artisanId: wage}
 
 function populateArtisanSelect(){
   const groups=[...new Set(artisans.map(a=>a.lse).filter(Boolean))].sort();
@@ -1105,16 +1117,24 @@ function toggleArtisan(id){
 function renderArtisanTags(){
   const tags=document.getElementById('oArtisanTags');
   if(!selectedArtisanIds.length){
-    tags.innerHTML='<span style="font-size:12px;color:#aaa;padding:2px 4px">No artisans selected — click below to add</span>';
+    tags.innerHTML='<div style="font-size:12px;color:#aaa;padding:4px">No artisans selected — click below to add</div>';
     return;
   }
   tags.innerHTML=selectedArtisanIds.map(id=>{
     const a=artisans.find(x=>x.id===id);
     if(!a)return'';
-    return `<span style="display:inline-flex;align-items:center;gap:4px;background:#E1F5EE;color:#0F6E56;padding:3px 8px;border-radius:20px;font-size:12px;font-weight:500">
-      ${a.name}
-      <span onclick="toggleArtisan('${id}')" style="cursor:pointer;font-size:14px;line-height:1;color:#0F6E56;margin-left:2px">×</span>
-    </span>`;
+    const wage=selectedArtisanWages[id]||'';
+    return `<div style="display:flex;align-items:center;gap:6px;background:#f5f5f3;border:1px solid #e0e0db;border-radius:8px;padding:5px 8px;width:100%">
+      <span style="font-size:13px;font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.name}</span>
+      <span style="font-size:11px;color:#888;white-space:nowrap">${a.lse||''}</span>
+      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+        <span style="font-size:12px;color:#666">EGP</span>
+        <input type="number" placeholder="Wage for this order" value="${wage}"
+          oninput="selectedArtisanWages['${id}']=parseFloat(this.value)||0"
+          style="width:110px;margin:0;padding:4px 6px;font-size:12px;border:1px solid #e0e0db;border-radius:6px"/>
+      </div>
+      <span onclick="toggleArtisan('${id}')" style="cursor:pointer;font-size:16px;color:#aaa;flex-shrink:0">×</span>
+    </div>`;
   }).filter(Boolean).join('');
 }
 
@@ -1135,8 +1155,9 @@ function openOrder(id){
     document.getElementById('oDue').value=o.dueDate||'';
     document.getElementById('oFollowUp').value=o.followUp||'';
     document.getElementById('oNotes').value=o.notes||'';
-    // Set artisans
+    // Set artisans and wages
     selectedArtisanIds=[...(o.artisans||[])];
+    selectedArtisanWages={...(o.artisanWages||{})};
     document.getElementById('oDel3').style.display=cur.role==='manager'?'':'none';
   }else{
     ['oId','oClient','oProducts','oNotes'].forEach(i=>document.getElementById(i).value='');
@@ -1149,6 +1170,7 @@ function openOrder(id){
     document.getElementById('oFollowUp').value='';
     document.getElementById('oDel3').style.display='none';
     selectedArtisanIds=[];
+    selectedArtisanWages={};
   }
   document.getElementById('oHint').textContent='';
   document.getElementById('oOrder').classList.add('on');
@@ -1173,6 +1195,7 @@ async function saveOrder(){
     notes:document.getElementById('oNotes').value.trim(),
     addedBy:cur.username,
     artisans:selArtisans,
+    artisanWages:{...selectedArtisanWages},
   };
   if(editId){
     const i=orders.findIndex(x=>x.id===editId);
