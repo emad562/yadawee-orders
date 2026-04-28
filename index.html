@@ -163,11 +163,13 @@ tr.ds td{background:#fffbf4;}
   </div>
 
   <div class="tabs">
-    <div class="tab on" id="tOrders" onclick="showTab('orders')">Orders</div>
+    <div class="tab on" id="tDashboard" onclick="showTab('dashboard')">Dashboard</div>
+    <div class="tab" id="tOrders" onclick="showTab('orders')">Orders</div>
     <div class="tab" id="tArtisans" onclick="showTab('artisans')">Artisans</div>
     <div class="tab" id="tActivity" onclick="showTab('activity')">Activity log</div>
     <div class="tab" id="tImpact" onclick="showTab('impact')">Impact report</div>
     <div class="tab" id="tClient" onclick="showTab('client')">Client statement</div>
+    <div class="tab" id="tPayments" onclick="showTab('payments')">Payments</div>
     <div class="tab" id="tTeam" onclick="showTab('team')" style="display:none">Team</div>
   </div>
 
@@ -229,12 +231,51 @@ tr.ds td{background:#fffbf4;}
     </div></div>
   </div>
 
+  <!-- DASHBOARD TAB -->
+  <div id="vDashboard" style="display:none">
+    <div id="dashContent"></div>
+  </div>
+
+  <!-- PAYMENTS TAB -->
+  <div id="vPayments" style="display:none">
+    <div class="tabbar">
+      <span style="font-size:14px;color:#888">Outstanding &amp; partial payments tracker</span>
+      <button class="btn blue gs" onclick="exportPaymentsCSV()">Export CSV</button>
+    </div>
+    <div class="filters">
+      <select id="payFilterStatus" onchange="renderPayments()" style="margin:0;flex:1">
+        <option value="">All statuses</option>
+        <option value="Unpaid">Unpaid</option>
+        <option value="Partial">Partial</option>
+        <option value="Paid">Paid</option>
+      </select>
+      <select id="payFilterAge" onchange="renderPayments()" style="margin:0;flex:1">
+        <option value="">All ages</option>
+        <option value="30">Overdue 30+ days</option>
+        <option value="60">Overdue 60+ days</option>
+        <option value="90">Overdue 90+ days</option>
+      </select>
+    </div>
+    <div class="metrics" id="payMetrics"></div>
+    <div class="card" style="margin-top:1rem"><div class="tscroll">
+      <table>
+        <thead><tr>
+          <th>Order ID</th><th>Client</th><th>Order date</th><th>Total</th>
+          <th>Paid so far</th><th>Outstanding</th><th>Due date</th><th>Days overdue</th><th>Status</th><th></th>
+        </tr></thead>
+        <tbody id="payTbody"></tbody>
+      </table>
+    </div></div>
+  </div>
+
   <!-- ARTISANS TAB -->
   <div id="vArtisans" style="display:none">
     <div class="tabbar">
       <span style="font-size:14px;color:#888">Track your artisan team</span>
       <div style="display:flex;gap:8px">
         <button class="btn blue gs" onclick="document.getElementById('artisanImportFile').click()">&#8593; Import Excel/CSV</button>
+        <button class="btn gs" style="border-color:#666;color:#444" onclick="exportArtisansExcel()">&#8595; Export CSV</button>
+        <button class="btn gs" style="border-color:#185FA5;color:#185FA5" onclick="generateUNHCRReport()">UNHCR Report</button>
         <input type="file" id="artisanImportFile" accept=".xlsx,.xls,.csv" style="display:none" onchange="importArtisans(this)"/>
         <button class="btn green gs" onclick="openArtisan()">+ add artisan</button>
       </div>
@@ -344,6 +385,15 @@ tr.ds td{background:#fffbf4;}
     <div><label>Payment due date</label><input type="date" id="oDue"/></div>
     <div><label>Follow-up reminder</label><input type="date" id="oFollowUp"/></div>
   </div>
+  <div class="slabel">Shipping details</div>
+  <div class="g3">
+    <div><label>Courier / shipping co.</label><input type="text" id="oCourier" placeholder="e.g. DHL, Aramex"/></div>
+    <div><label>Tracking number</label><input type="text" id="oTracking" placeholder="e.g. 1234567890"/></div>
+    <div><label>Ship date</label><input type="date" id="oShipDate"/></div>
+  </div>
+  <div class="slabel">Payment details</div>
+  <div id="oPaymentsList" style="margin-bottom:8px"></div>
+  <button class="btn sm" style="border-style:dashed;margin-bottom:12px" onclick="addPaymentEntry()">+ add payment received</button>
   <label>Notes</label>
   <textarea id="oNotes" placeholder="Any notes for the team..."></textarea>
   <div class="mfoot">
@@ -525,7 +575,9 @@ async function login(){
     activityLog=await api('load-activity');
     if(!Array.isArray(activityLog))activityLog=[];
     populateMonths();
-    sync('ok');render();
+    sync('ok');
+    showTab('dashboard');
+    render();
   }catch(e){document.getElementById('loginErr').textContent='Connection error. Try again.';btn.textContent='Sign in';btn.disabled=false;}
 }
 
@@ -546,13 +598,15 @@ function sync(s){
 }
 
 function showTab(t){
-  ['Orders','Artisans','Activity','Impact','Client','Team'].forEach(x=>{
+  ['Dashboard','Orders','Artisans','Activity','Impact','Client','Payments','Team'].forEach(x=>{
     document.getElementById('v'+x).style.display=t===x.toLowerCase()?'':'none';
     document.getElementById('t'+x).className='tab'+(t===x.toLowerCase()?' on':'');
   });
+  if(t==='dashboard')renderDashboard();
   if(t==='artisans')renderArtisans();
   if(t==='activity')renderActivity();
   if(t==='impact')renderImpact();
+  if(t==='payments')renderPayments();
   if(t==='team')renderTeam();
 }
 
@@ -623,6 +677,7 @@ function render(){
           <button class="btn sm" onclick="openOrder('${o.id}')">Edit</button>
           <button class="btn sm blue" onclick="openExp('${o.id}','${o.client}')">Exp</button>
           <button class="btn sm amber" onclick="openComments('${o.id}','${o.client}')">Notes</button>
+          <button class="btn sm" style="border-color:#666;color:#444" onclick="generateInvoice('${o.id}')">Invoice</button>
         </td>
       </tr>`;
     }).join('');
@@ -1154,6 +1209,10 @@ function openOrder(id){
     document.getElementById('oDel2').value=o.delivery||'Pending';
     document.getElementById('oDue').value=o.dueDate||'';
     document.getElementById('oFollowUp').value=o.followUp||'';
+    document.getElementById('oCourier').value=o.courier||'';
+    document.getElementById('oTracking').value=o.tracking||'';
+    document.getElementById('oShipDate').value=o.shipDate||'';
+    renderPaymentEntries(o.payments||[]);
     document.getElementById('oNotes').value=o.notes||'';
     // Set artisans and wages
     selectedArtisanIds=[...(o.artisans||[])];
@@ -1168,6 +1227,10 @@ function openOrder(id){
     document.getElementById('oDel2').value='Pending';
     document.getElementById('oDue').value='';
     document.getElementById('oFollowUp').value='';
+    document.getElementById('oCourier').value='';
+    document.getElementById('oTracking').value='';
+    document.getElementById('oShipDate').value='';
+    renderPaymentEntries([]);
     document.getElementById('oDel3').style.display='none';
     selectedArtisanIds=[];
     selectedArtisanWages={};
@@ -1193,6 +1256,10 @@ async function saveOrder(){
     dueDate:document.getElementById('oDue').value,
     followUp:document.getElementById('oFollowUp').value,
     notes:document.getElementById('oNotes').value.trim(),
+    courier:document.getElementById('oCourier').value.trim(),
+    tracking:document.getElementById('oTracking').value.trim(),
+    shipDate:document.getElementById('oShipDate').value,
+    payments:getPaymentEntries(),
     addedBy:cur.username,
     artisans:selArtisans,
     artisanWages:{...selectedArtisanWages},
@@ -1484,6 +1551,348 @@ async function confirmImport(){
   sync('ok');
   showTab('artisans');
   alert(`Successfully imported ${newOnes.length} artisans!${dupes>0?' '+dupes+' duplicates were skipped.':''}`);
+}
+
+
+// ========== DASHBOARD ==========
+function renderDashboard(){
+  const now=new Date();
+  const thisMonth=now.getFullYear()+'-'+(now.getMonth()+1).toString().padStart(2,'0');
+  const monthOrds=orders.filter(o=>o.date&&o.date.startsWith(thisMonth));
+  const totalRev=orders.reduce((s,o)=>s+egp(o),0);
+  const monthRev=monthOrds.reduce((s,o)=>s+egp(o),0);
+  const unpaid=orders.filter(o=>o.payment==='Unpaid').reduce((s,o)=>s+egp(o),0);
+  const partial=orders.filter(o=>o.payment==='Partial').reduce((s,o)=>s+egp(o),0);
+  const active=orders.filter(o=>!['Delivered','Cancelled'].includes(o.delivery)).length;
+  const overdue=orders.filter(o=>{const d=df(o.dueDate);return o.payment!=='Paid'&&d!==null&&d<0;});
+  
+  // Top clients
+  const clientRev={};
+  orders.forEach(o=>{clientRev[o.client]=(clientRev[o.client]||0)+egp(o);});
+  const topClients=Object.entries(clientRev).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  
+  // Artisan workload
+  const artisanLoad={};
+  orders.filter(o=>!['Delivered','Cancelled'].includes(o.delivery)).forEach(o=>{
+    (o.artisans||[]).forEach(id=>{artisanLoad[id]=(artisanLoad[id]||0)+1;});
+  });
+  const busyArtisans=Object.entries(artisanLoad).sort((a,b)=>b[1]-a[1]).slice(0,5)
+    .map(([id,cnt])=>{const a=artisans.find(x=>x.id===id);return{name:a?a.name:id,lse:a?a.lse:'',cnt};});
+
+  document.getElementById('dashContent').innerHTML=`
+    <div style="margin-bottom:1.5rem">
+      <div style="font-size:18px;font-weight:500;margin-bottom:1rem">Welcome back, ${cur.username}!</div>
+      <div class="metrics" style="grid-template-columns:repeat(4,1fr)">
+        <div class="metric"><div class="mlbl">Total orders</div><div class="mval">${orders.length}</div></div>
+        <div class="metric"><div class="mlbl">Active orders</div><div class="mval a">${active}</div></div>
+        <div class="metric"><div class="mlbl">This month revenue</div><div class="mval g">EGP ${Math.round(monthRev).toLocaleString()}</div></div>
+        <div class="metric"><div class="mlbl">Outstanding</div><div class="mval r">EGP ${Math.round(unpaid+partial).toLocaleString()}</div></div>
+      </div>
+    </div>
+
+    ${overdue.length?`<div class="rbar on" style="margin-bottom:1.5rem">
+      <strong>⚠ ${overdue.length} overdue payment${overdue.length>1?'s':''}</strong>
+      ${overdue.slice(0,3).map(o=>`<div class="ritem"><span class="dot r"></span>${o.client} — EGP ${Math.round(egp(o)).toLocaleString()} (due ${o.dueDate})</div>`).join('')}
+      ${overdue.length>3?`<div style="margin-top:4px;font-size:12px"><a href="#" onclick="showTab('payments');return false">View all ${overdue.length} overdue →</a></div>`:''}
+    </div>`:''}
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+      <div class="report-section">
+        <h4>Top clients by revenue</h4>
+        ${topClients.length?`<table style="width:100%;font-size:13px;border-collapse:collapse">
+          ${topClients.map(([client,rev],i)=>`<tr style="border-bottom:1px solid #f0f0ec">
+            <td style="padding:5px 0"><span style="color:#aaa;font-size:11px">#${i+1}</span> ${client}</td>
+            <td style="padding:5px 0;text-align:right;font-weight:500;color:#1D9E75">EGP ${Math.round(rev).toLocaleString()}</td>
+          </tr>`).join('')}
+        </table>`:'<div style="color:#888;font-size:13px">No orders yet.</div>'}
+      </div>
+      <div class="report-section">
+        <h4>Busiest artisans (active orders)</h4>
+        ${busyArtisans.length?`<table style="width:100%;font-size:13px;border-collapse:collapse">
+          ${busyArtisans.map((a,i)=>`<tr style="border-bottom:1px solid #f0f0ec">
+            <td style="padding:5px 0"><span style="color:#aaa;font-size:11px">#${i+1}</span> ${a.name} <span style="font-size:11px;color:#888">${a.lse}</span></td>
+            <td style="padding:5px 0;text-align:right"><span style="background:#E6F1FB;color:#185FA5;padding:2px 6px;border-radius:10px;font-size:11px">${a.cnt} order${a.cnt>1?'s':''}</span></td>
+          </tr>`).join('')}
+        </table>`:'<div style="color:#888;font-size:13px">No artisans assigned to active orders.</div>'}
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div class="report-section">
+        <h4>Orders by delivery status</h4>
+        ${['Pending','Confirmed','Shipped','Delivered','Cancelled'].map(s=>{
+          const cnt=orders.filter(o=>o.delivery===s).length;
+          const pct=orders.length?Math.round((cnt/orders.length)*100):0;
+          return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span class="badge ${s.toLowerCase()}" style="font-size:12px">${s}</span>
+            <div style="flex:1;margin:0 10px;background:#f0f0ec;border-radius:4px;height:6px">
+              <div style="width:${pct}%;height:6px;border-radius:4px;background:#1D9E75"></div>
+            </div>
+            <span style="font-size:12px;color:#888">${cnt}</span>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="report-section">
+        <h4>Artisan team overview</h4>
+        <div style="font-size:13px;color:#666;margin-bottom:8px">${artisans.length} total artisans across ${[...new Set(artisans.map(a=>a.lse).filter(Boolean))].length} LSE groups</div>
+        ${[...new Set(artisans.map(a=>a.lse).filter(Boolean))].sort().map(g=>{
+          const cnt=artisans.filter(a=>a.lse===g).length;
+          const busy=Object.keys(artisanLoad).filter(id=>{const a=artisans.find(x=>x.id===id);return a&&a.lse===g;}).length;
+          return `<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+            <span>${g}</span>
+            <span style="color:#888">${cnt} artisans${busy?', '+busy+' on active orders':''}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ========== PARTIAL PAYMENTS ==========
+let paymentEntries=[];
+
+function renderPaymentEntries(payments){
+  paymentEntries=Array.isArray(payments)?[...payments]:[];
+  updatePaymentsList();
+}
+
+function updatePaymentsList(){
+  const div=document.getElementById('oPaymentsList');
+  if(!paymentEntries.length){
+    div.innerHTML='<div style="font-size:12px;color:#aaa;margin-bottom:4px">No payments recorded yet.</div>';
+    return;
+  }
+  div.innerHTML=paymentEntries.map((p,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;background:#f5f5f3;border-radius:8px;padding:6px 10px">
+      <input type="date" value="${p.date||''}" onchange="paymentEntries[${i}].date=this.value" style="margin:0;flex:1;font-size:13px;padding:4px 6px"/>
+      <span style="font-size:13px;color:#666">EGP</span>
+      <input type="number" value="${p.amount||''}" placeholder="Amount" onchange="paymentEntries[${i}].amount=parseFloat(this.value)||0" style="margin:0;width:100px;font-size:13px;padding:4px 6px"/>
+      <input type="text" value="${p.note||''}" placeholder="Note (optional)" onchange="paymentEntries[${i}].note=this.value" style="margin:0;flex:1;font-size:13px;padding:4px 6px"/>
+      <button class="btn sm red" onclick="paymentEntries.splice(${i},1);updatePaymentsList()">x</button>
+    </div>`).join('');
+}
+
+function addPaymentEntry(){
+  paymentEntries.push({date:new Date().toISOString().slice(0,10),amount:0,note:''});
+  updatePaymentsList();
+}
+
+function getPaymentEntries(){
+  return [...paymentEntries];
+}
+
+// ========== PAYMENTS TAB ==========
+function renderPayments(){
+  const statusF=document.getElementById('payFilterStatus').value;
+  const ageF=parseInt(document.getElementById('payFilterAge').value)||0;
+  
+  let rows=orders.filter(o=>o.payment!=='Paid');
+  if(statusF)rows=rows.filter(o=>o.payment===statusF);
+  if(ageF)rows=rows.filter(o=>{const d=df(o.dueDate);return d!==null&&d<=-ageF;});
+  
+  const totalUnpaid=orders.filter(o=>o.payment==='Unpaid').reduce((s,o)=>s+egp(o),0);
+  const totalPartial=orders.filter(o=>o.payment==='Partial').reduce((s,o)=>s+egp(o),0);
+  const totalPaidSoFar=orders.reduce((s,o)=>s+(o.payments||[]).reduce((ps,p)=>ps+(parseFloat(p.amount)||0),0),0);
+  
+  document.getElementById('payMetrics').innerHTML=`
+    <div class="metric"><div class="mlbl">Unpaid orders</div><div class="mval r">${orders.filter(o=>o.payment==='Unpaid').length}</div></div>
+    <div class="metric"><div class="mlbl">Total unpaid</div><div class="mval r">EGP ${Math.round(totalUnpaid).toLocaleString()}</div></div>
+    <div class="metric"><div class="mlbl">Partial orders</div><div class="mval a">${orders.filter(o=>o.payment==='Partial').length}</div></div>
+    <div class="metric"><div class="mlbl">Total partial outstanding</div><div class="mval a">EGP ${Math.round(totalPartial).toLocaleString()}</div></div>
+  `;
+  
+  const tb=document.getElementById('payTbody');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="10"><div class="empty">No outstanding payments.</div></td></tr>';return;}
+  
+  rows.sort((a,b)=>{const da=df(a.dueDate)||0,db=df(b.dueDate)||0;return da-db;});
+  
+  tb.innerHTML=rows.map(o=>{
+    const paidSoFar=(o.payments||[]).reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+    const outstanding=Math.round(egp(o))-paidSoFar;
+    const daysOverdue=df(o.dueDate);
+    const overdueCls=daysOverdue!==null&&daysOverdue<0?'color:#E24B4A;font-weight:500':'color:#888';
+    return `<tr>
+      <td style="font-family:monospace;font-size:12px;font-weight:500">${o.id}</td>
+      <td>${o.client}</td>
+      <td style="color:#888">${o.date}</td>
+      <td style="font-weight:500">EGP ${Math.round(egp(o)).toLocaleString()}</td>
+      <td style="color:#1D9E75">EGP ${paidSoFar.toLocaleString()}</td>
+      <td style="color:#E24B4A;font-weight:500">EGP ${outstanding.toLocaleString()}</td>
+      <td style="color:#888">${o.dueDate||'-'}</td>
+      <td style="${overdueCls}">${daysOverdue!==null?(daysOverdue<0?Math.abs(daysOverdue)+' days':daysOverdue===0?'Today':daysOverdue+' days left'):'-'}</td>
+      <td><span class="badge ${o.payment.toLowerCase()}">${o.payment}</span></td>
+      <td><button class="btn sm" onclick="openOrder('${o.id}')">Edit</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function exportPaymentsCSV(){
+  const h=['Order ID','Client','Date','Total (EGP)','Paid so far','Outstanding','Due date','Days overdue','Status'];
+  const rows=orders.filter(o=>o.payment!=='Paid').map(o=>{
+    const paidSoFar=(o.payments||[]).reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+    const outstanding=Math.round(egp(o))-paidSoFar;
+    const d=df(o.dueDate);
+    return [o.id,o.client,o.date,Math.round(egp(o)),paidSoFar,outstanding,o.dueDate||'',d!==null?(d<0?-d+'overdue':d+'remaining'):'',o.payment]
+      .map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',');
+  });
+  const csv=[h.join(','),...rows].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='yadawee_payments.csv';a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ========== INVOICE GENERATOR ==========
+function generateInvoice(orderId){
+  const o=orders.find(x=>x.id===orderId);
+  if(!o)return;
+  const w=window.open('','_blank');
+  const artNames=(o.artisans||[]).map(id=>{const a=artisans.find(x=>x.id===id);return a?a.name:'';}).filter(Boolean).join(', ');
+  const payments=(o.payments||[]);
+  const paidSoFar=payments.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+  const outstanding=Math.round(egp(o))-paidSoFar;
+  w.document.write(`<!DOCTYPE html><html><head><title>Invoice ${o.id}</title>
+  <style>
+    body{font-family:Arial,sans-serif;max-width:700px;margin:2rem auto;padding:2rem;color:#1a1a1a;}
+    .hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem;padding-bottom:1rem;border-bottom:2px solid #1D9E75;}
+    .logo{font-size:24px;font-weight:bold;color:#1D9E75;}
+    .inv-no{font-size:14px;color:#888;}
+    table{width:100%;border-collapse:collapse;margin:1rem 0;}
+    th,td{padding:10px;text-align:left;border-bottom:1px solid #e8e8e4;}
+    th{background:#f5f5f3;font-weight:500;font-size:13px;color:#666;}
+    .total-row{font-weight:bold;font-size:15px;}
+    .status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;}
+    .paid{background:#EAF3DE;color:#3B6D11;}
+    .unpaid{background:#FCEBEB;color:#A32D2D;}
+    .partial{background:#FAEEDA;color:#854F0B;}
+    .footer{margin-top:3rem;padding-top:1rem;border-top:1px solid #e8e8e4;font-size:12px;color:#888;text-align:center;}
+    @media print{body{margin:0;padding:1rem;}}
+  </style>
+  </head><body>
+  <div class="hdr">
+    <div><div class="logo">Yadawee</div><div style="font-size:13px;color:#888;margin-top:4px">Social Enterprise</div></div>
+    <div style="text-align:right">
+      <div style="font-size:20px;font-weight:bold">INVOICE</div>
+      <div class="inv-no">${o.id}</div>
+      <div class="inv-no">Date: ${o.date}</div>
+      ${o.dueDate?`<div class="inv-no">Due: ${o.dueDate}</div>`:''}
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem">
+    <div><div style="font-size:12px;color:#888;margin-bottom:4px">BILLED TO</div><div style="font-size:16px;font-weight:500">${o.client}</div></div>
+    <div><div style="font-size:12px;color:#888;margin-bottom:4px">STATUS</div><span class="status ${o.payment.toLowerCase()}">${o.payment}</span></div>
+  </div>
+  <table>
+    <thead><tr><th>Description</th><th style="text-align:right">Amount</th></tr></thead>
+    <tbody>
+      <tr><td>${o.products||'Handicraft products'}</td><td style="text-align:right;font-weight:500">${o.currency} ${o.total.toLocaleString()}</td></tr>
+      ${artNames?`<tr><td style="font-size:12px;color:#888">Artisans: ${artNames}</td><td></td></tr>`:''}
+    </tbody>
+  </table>
+  <div style="display:flex;justify-content:flex-end">
+    <table style="width:280px">
+      <tr><td>Subtotal</td><td style="text-align:right">${o.currency} ${o.total.toLocaleString()}</td></tr>
+      ${payments.length?payments.map(p=>`<tr><td style="color:#1D9E75">Payment received (${p.date})</td><td style="text-align:right;color:#1D9E75">- EGP ${(parseFloat(p.amount)||0).toLocaleString()}${p.note?' ('+p.note+')':''}</td></tr>`).join(''):''}
+      <tr class="total-row" style="border-top:2px solid #1a1a1a">
+        <td>Outstanding</td>
+        <td style="text-align:right;color:${outstanding>0?'#E24B4A':'#1D9E75'}">EGP ${outstanding.toLocaleString()}</td>
+      </tr>
+    </table>
+  </div>
+  ${o.courier||o.tracking?`<div style="margin-top:1.5rem;padding:12px;background:#f5f5f3;border-radius:8px;font-size:13px">
+    <strong>Shipping:</strong> ${o.courier||''} ${o.tracking?'· Tracking: '+o.tracking:''} ${o.shipDate?'· Ship date: '+o.shipDate:''}
+  </div>`:''}
+  ${o.notes?`<div style="margin-top:1rem;font-size:13px;color:#666"><strong>Notes:</strong> ${o.notes}</div>`:''}
+  <div class="footer">Thank you for your business · Yadawee Social Enterprise · Generated ${new Date().toLocaleDateString('en-GB')}</div>
+  <script>window.onload=()=>setTimeout(()=>window.print(),400);<\/script>
+  </body></html>`);
+  w.document.close();
+}
+
+// ========== EXPORT ARTISANS ==========
+function exportArtisansExcel(){
+  const h=['Name','LSE Group','Gender','Age','Origin','Phone','Specialty','Location','Date Joined','Wage','Wage Type','UNHCR Case No','UNHCR Ind No','MYR','Notes'];
+  const rows=artisans.map(a=>[a.name,a.lse||'',a.gender||'',a.age||'',a.origin||'',a.phone||'',a.specialty||'',a.location||'',a.joined||'',a.wage||0,a.wageType==='per_piece'?'Per piece':'Monthly',a.unhcrCase||'',a.unhcrInd||'',a.myr||'',a.notes||''].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+  const csv=[h.join(','),...rows].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='yadawee_artisans.csv';a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ========== UNHCR REPORT ==========
+function generateUNHCRReport(){
+  const now=new Date();
+  const thisMonth=now.getFullYear()+'-'+(now.getMonth()+1).toString().padStart(2,'0');
+  const monthName=now.toLocaleString('en-GB',{month:'long',year:'numeric'});
+  const monthOrds=orders.filter(o=>o.date&&o.date.startsWith(thisMonth));
+  const assignedIds=[...new Set(monthOrds.flatMap(o=>o.artisans||[]))];
+  const activeArtisans=assignedIds.map(id=>artisans.find(a=>a.id===id)).filter(Boolean);
+  const wagesPaid=monthOrds.reduce((s,o)=>{const w=o.artisanWages||{};return s+Object.values(w).reduce((ws,v)=>ws+(parseFloat(v)||0),0);},0);
+
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>UNHCR Report - ${monthName}</title>
+  <style>
+    body{font-family:Arial,sans-serif;max-width:800px;margin:2rem auto;padding:2rem;color:#1a1a1a;font-size:13px;}
+    h1{color:#1D9E75;font-size:20px;margin-bottom:4px;}
+    h2{font-size:15px;margin:1.5rem 0 8px;border-bottom:1px solid #e8e8e4;padding-bottom:4px;}
+    table{width:100%;border-collapse:collapse;margin:8px 0;}
+    th,td{padding:7px 10px;border:1px solid #e8e8e4;text-align:left;font-size:12px;}
+    th{background:#f5f5f3;font-weight:600;}
+    .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:1rem 0;}
+    .scard{background:#f5f5f3;border-radius:6px;padding:12px;text-align:center;}
+    .sv{font-size:22px;font-weight:bold;color:#1D9E75;}
+    .sl{font-size:11px;color:#888;margin-top:2px;}
+    @media print{body{margin:0;padding:1rem;}}
+  </style></head><body>
+  <h1>Yadawee Social Enterprise</h1>
+  <div style="color:#888;margin-bottom:1rem">UNHCR Livelihood Impact Report — ${monthName}</div>
+  <div class="summary">
+    <div class="scard"><div class="sv">${activeArtisans.length}</div><div class="sl">Refugees employed</div></div>
+    <div class="scard"><div class="sv">${monthOrds.length}</div><div class="sl">Orders this month</div></div>
+    <div class="scard"><div class="sv">EGP ${Math.round(wagesPaid).toLocaleString()}</div><div class="sl">Wages paid</div></div>
+  </div>
+  <h2>Refugee Beneficiary List</h2>
+  <table>
+    <thead><tr><th>#</th><th>Full Name</th><th>UNHCR Case No</th><th>UNHCR Ind No</th><th>MYR</th><th>Gender</th><th>Age</th><th>Origin</th><th>LSE Group</th><th>Orders</th><th>Wages (EGP)</th></tr></thead>
+    <tbody>${activeArtisans.map((a,i)=>{
+      const artOrders=monthOrds.filter(o=>o.artisans&&o.artisans.includes(a.id));
+      const wages=artOrders.reduce((s,o)=>s+((o.artisanWages&&o.artisanWages[a.id])||0),0);
+      return `<tr>
+        <td>${i+1}</td>
+        <td><strong>${a.name}</strong></td>
+        <td>${a.unhcrCase||'-'}</td>
+        <td>${a.unhcrInd||'-'}</td>
+        <td>${a.myr||'-'}</td>
+        <td>${a.gender||'-'}</td>
+        <td>${a.age||'-'}</td>
+        <td>${a.origin||'-'}</td>
+        <td>${a.lse||'-'}</td>
+        <td>${artOrders.map(o=>o.id).join(', ')}</td>
+        <td>${wages?wages.toLocaleString():'-'}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>
+  <h2>LSE Group Summary</h2>
+  <table>
+    <thead><tr><th>LSE Group</th><th>Total artisans</th><th>Active this month</th><th>Wages paid (EGP)</th></tr></thead>
+    <tbody>${[...new Set(artisans.map(a=>a.lse).filter(Boolean))].sort().map(g=>{
+      const total=artisans.filter(a=>a.lse===g).length;
+      const active=activeArtisans.filter(a=>a.lse===g).length;
+      const wages=monthOrds.reduce((s,o)=>{
+        const artW=o.artisanWages||{};
+        return s+(o.artisans||[]).filter(id=>{const a=artisans.find(x=>x.id===id);return a&&a.lse===g;})
+          .reduce((ws,id)=>ws+(parseFloat(artW[id])||0),0);
+      },0);
+      return `<tr><td>${g}</td><td>${total}</td><td>${active}</td><td>${wages?wages.toLocaleString():'-'}</td></tr>`;
+    }).join('')}</tbody>
+  </table>
+  <div style="margin-top:2rem;font-size:11px;color:#888;border-top:1px solid #e8e8e4;padding-top:1rem">
+    Generated by Yadawee Order Manager · ${new Date().toLocaleDateString('en-GB')} · Confidential
+  </div>
+  <script>window.onload=()=>setTimeout(()=>window.print(),400);<\/script>
+  </body></html>`);
+  w.document.close();
 }
 
 function exportCSV(){
