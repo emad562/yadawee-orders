@@ -650,10 +650,6 @@ function render(){
 // ARTISANS
 function renderArtisans(){
   const totalWages=artisans.filter(a=>a.wageType!=='per_piece').reduce((s,a)=>s+(parseFloat(a.wage)||0),0);
-  const actualWagesPaid=monthOrders.reduce((s,o)=>{
-    const wages=o.artisanWages||{};
-    return s+Object.values(wages).reduce((ws,w)=>ws+(parseFloat(w)||0),0);
-  },0);
   const groups=[...new Set(artisans.map(a=>a.lse).filter(Boolean))].sort();
 
   // Populate LSE filter dropdown
