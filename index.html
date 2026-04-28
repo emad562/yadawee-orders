@@ -1114,6 +1114,10 @@ function toggleArtisan(id){
   filterArtisansByLse();
 }
 
+function updateArtisanWage(input, id){
+  selectedArtisanWages[id]=parseFloat(input.value)||0;
+}
+
 function renderArtisanTags(){
   const tags=document.getElementById('oArtisanTags');
   if(!selectedArtisanIds.length){
@@ -1130,7 +1134,7 @@ function renderArtisanTags(){
       <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
         <span style="font-size:12px;color:#666">EGP</span>
         <input type="number" placeholder="Wage for this order" value="${wage}"
-          oninput="selectedArtisanWages['${id}']=parseFloat(this.value)||0"
+          oninput="updateArtisanWage(this,'${id}')"
           style="width:110px;margin:0;padding:4px 6px;font-size:12px;border:1px solid #e0e0db;border-radius:6px"/>
       </div>
       <span onclick="toggleArtisan('${id}')" style="cursor:pointer;font-size:16px;color:#aaa;flex-shrink:0">×</span>
