@@ -412,6 +412,10 @@ tr.ds td{background:#fffbf4;}
     <div><label>Full name</label><input type="text" id="aName" placeholder="e.g. Fatima Hassan"/></div>
     <div><label>Phone number</label><input type="text" id="aPhone" placeholder="e.g. 010xxxxxxxx"/></div>
   </div>
+  <div style="margin-bottom:12px;display:flex;align-items:center;gap:10px">
+    <input type="checkbox" id="aIsEmployee" style="width:auto;margin:0" onchange="toggleEmployeeMode(this)"/>
+    <label style="margin:0;font-size:13px;cursor:pointer" for="aIsEmployee">This is a Yadawee employee (not an external artisan)</label>
+  </div>
   <div class="g2">
     <div><label>LSE (Group)</label><select id="aLse" style="margin-bottom:12px" onchange="handleLseChange(this)"><option value="">-- select group --</option><option>Yadawee's team</option><option>Yadawee - Al Sadu</option><option>Yadawee - NF</option><option>Yadawee - Star</option><option>Yadawee - Drum</option><option>Yadawee - Braclet</option><option>Yadawee - Duma</option><option value="other">Other (type below)</option></select><input type="text" id="aLseCustom" placeholder="Type custom group name..." style="display:none;margin-bottom:12px"/></div>
     <div><label>Craft specialty</label><input type="text" id="aSpecialty" placeholder="e.g. Weaving, Ceramics"/></div>
@@ -435,10 +439,18 @@ tr.ds td{background:#fffbf4;}
     <div><label>Country of origin</label><input type="text" id="aOrigin" placeholder="e.g. Sudan, Syria"/></div>
     <div><label>Age</label><input type="number" id="aAge" placeholder="e.g. 32" min="1" max="120"/></div>
   </div>
-  <div class="g3">
-    <div><label>UNHCR Case No.</label><input type="text" id="aUnhcrCase" placeholder="e.g. 123456"/></div>
-    <div><label>UNHCR Ind. No.</label><input type="text" id="aUnhcrInd" placeholder="e.g. 001"/></div>
-    <div><label>MYR</label><input type="text" id="aMyr" placeholder="UNHCR MYR field"/></div>
+  <div id="aUnhcrSection">
+    <div class="g3">
+      <div><label>UNHCR Case No.</label><input type="text" id="aUnhcrCase" placeholder="e.g. 123456"/></div>
+      <div><label>UNHCR Ind. No.</label><input type="text" id="aUnhcrInd" placeholder="e.g. 001"/></div>
+      <div><label>MYR</label><input type="text" id="aMyr" placeholder="UNHCR MYR field"/></div>
+    </div>
+  </div>
+  <div id="aNatIdSection" style="display:none">
+    <div class="g2">
+      <div><label>National ID No.</label><input type="text" id="aNatId" placeholder="e.g. 12345678901234"/></div>
+      <div></div>
+    </div>
   </div>
   <div class="g2">
     <div><label>Gender</label><select id="aGender" style="margin-bottom:12px"><option value="">-- select --</option><option value="F">F - Female</option><option value="M">M - Male</option></select></div>
@@ -705,7 +717,8 @@ function render(){
 // ARTISANS
 function renderArtisans(){
   const totalWages=artisans.filter(a=>a.wageType!=='per_piece').reduce((s,a)=>s+(parseFloat(a.wage)||0),0);
-  const groups=[...new Set(artisans.map(a=>a.lse).filter(Boolean))].sort();
+  const employees=artisans.filter(a=>a.isEmployee);
+  const groups=[...new Set(artisans.filter(a=>!a.isEmployee).map(a=>a.lse).filter(Boolean))].sort();
 
   // Populate LSE filter dropdown
   const lseSel=document.getElementById('artisanLseFilter');
@@ -728,10 +741,10 @@ function renderArtisans(){
   });
 
   document.getElementById('artisanMetrics').innerHTML=`
-    <div class="metric"><div class="mlbl">Total artisans</div><div class="mval b">${artisans.length}</div></div>
-    <div class="metric"><div class="mlbl">Showing</div><div class="mval b">${filtered.length}</div></div>
+    <div class="metric"><div class="mlbl">Total artisans</div><div class="mval b">${artisans.filter(a=>!a.isEmployee).length}</div></div>
+    <div class="metric"><div class="mlbl">Yadawee employees</div><div class="mval b">${employees.length}</div></div>
     <div class="metric"><div class="mlbl">LSE groups</div><div class="mval a">${groups.length}</div></div>
-    <div class="metric"><div class="mlbl">Total monthly wages</div><div class="mval g">EGP ${Math.round(totalWages).toLocaleString()}</div></div>
+    <div class="metric"><div class="mlbl">Showing</div><div class="mval g">${filtered.length}</div></div>
   `;
   const list=document.getElementById('artisanList');
   if(!artisans.length){list.innerHTML='<div class="empty">No artisans added yet. Click above to add your first artisan.</div>';return;}
@@ -741,10 +754,10 @@ function renderArtisans(){
       <div class="artisan-avatar">${(a.name||'?')[0].toUpperCase()}</div>
       <div class="artisan-info">
         <div class="artisan-name">${a.name}</div>
-        <div class="artisan-meta">${a.lse?'<span style="background:#E1F5EE;color:#0F6E56;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:500">'+a.lse+'</span> ':''}</div>
+        <div class="artisan-meta">${a.isEmployee?'<span style="background:#E6F1FB;color:#185FA5;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:500">Yadawee Employee</span>':a.lse?'<span style="background:#E1F5EE;color:#0F6E56;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:500">'+a.lse+'</span>':''}</div>
         <div class="artisan-meta" style="margin-top:3px">${[a.specialty,a.location,a.origin,a.gender?(a.gender+(a.age?' · Age '+a.age:'')):a.age?'Age '+a.age:''].filter(Boolean).join(' · ')}</div>
         <div class="artisan-meta" style="margin-top:4px">${a.phone||''} ${a.wage?'· EGP '+parseFloat(a.wage).toLocaleString()+(a.wageType==='per_piece'?'/piece':'/mo'):''}</div>
-        ${(a.unhcrCase||a.unhcrInd)?`<div class="artisan-meta" style="margin-top:4px">UNHCR Case: ${a.unhcrCase||'-'} · Ind: ${a.unhcrInd||'-'}${a.myr?' · MYR: '+a.myr:''}</div>`:''}
+        ${a.isEmployee&&a.natId?`<div class="artisan-meta" style="margin-top:4px">National ID: ${a.natId}</div>`:(!a.isEmployee&&(a.unhcrCase||a.unhcrInd))?`<div class="artisan-meta" style="margin-top:4px">UNHCR Case: ${a.unhcrCase||'-'} · Ind: ${a.unhcrInd||'-'}${a.myr?' · MYR: '+a.myr:''}</div>`:''}
         ${a.notes?`<div class="artisan-meta" style="margin-top:4px;font-style:italic">${a.notes}</div>`:''}
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
@@ -789,13 +802,19 @@ function openArtisan(id){
     document.getElementById('aGender').value=a.gender||'';
     document.getElementById('aDelBtn').style.display=cur.role==='manager'?'':'none';
   }else{
-    ['aName','aPhone','aSpecialty','aLocation','aJoined','aWage','aNotes','aUnhcrCase','aUnhcrInd','aMyr','aOrigin','aAge','aLseCustom'].forEach(i=>document.getElementById(i).value='');
+    ['aName','aPhone','aSpecialty','aLocation','aJoined','aWage','aNotes','aUnhcrCase','aUnhcrInd','aMyr','aOrigin','aAge','aLseCustom','aNatId'].forEach(i=>document.getElementById(i).value='');
     document.getElementById('aWageType').value='monthly';
     document.getElementById('aGender').value='';
     document.getElementById('aLse').value='';
     document.getElementById('aLseCustom').style.display='none';
     document.getElementById('aDelBtn').style.display='none';
   }
+  // Set employee flag
+  const aData=editArtisanId?artisans.find(x=>x.id===editArtisanId):null;
+  const isEmpFlag=!!(aData&&aData.isEmployee);
+  document.getElementById('aIsEmployee').checked=isEmpFlag;
+  document.getElementById('aNatId').value=aData&&aData.natId||'';
+  toggleEmployeeMode({checked:isEmpFlag});
   document.getElementById('oArtisan').classList.add('on');
 }
 function closeArtisan(){document.getElementById('oArtisan').classList.remove('on');}
@@ -812,7 +831,9 @@ async function saveArtisan(){
     wage:parseFloat(document.getElementById('aWage').value)||0,
     wageType:document.getElementById('aWageType').value,
     notes:document.getElementById('aNotes').value.trim(),
-    lse:document.getElementById('aLse').value==='other'?document.getElementById('aLseCustom').value.trim():document.getElementById('aLse').value,
+    isEmployee:document.getElementById('aIsEmployee').checked,
+    natId:document.getElementById('aNatId').value.trim(),
+    lse:document.getElementById('aIsEmployee').checked?'Yadawee Employee':document.getElementById('aLse').value==='other'?document.getElementById('aLseCustom').value.trim():document.getElementById('aLse').value,
     origin:document.getElementById('aOrigin').value.trim(),
     age:document.getElementById('aAge').value,
     unhcrCase:document.getElementById('aUnhcrCase').value.trim(),
@@ -1400,6 +1421,23 @@ function convHint(){
 
 function updateWageLabel(){
   // No label change needed - select already shows type
+}
+
+function toggleEmployeeMode(cb){
+  const lseDiv=document.getElementById('aLse').closest('.g2');
+  const unhcrSec=document.getElementById('aUnhcrSection');
+  const natIdSec=document.getElementById('aNatIdSection');
+  if(cb.checked){
+    lseDiv.style.opacity='0.4';
+    lseDiv.style.pointerEvents='none';
+    if(unhcrSec)unhcrSec.style.display='none';
+    if(natIdSec)natIdSec.style.display='';
+  }else{
+    lseDiv.style.opacity='1';
+    lseDiv.style.pointerEvents='auto';
+    if(unhcrSec)unhcrSec.style.display='';
+    if(natIdSec)natIdSec.style.display='none';
+  }
 }
 
 function handleLseChange(sel){
