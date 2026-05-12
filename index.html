@@ -176,7 +176,14 @@ tr.ds td{background:#fffbf4;}
   <!-- ORDERS TAB -->
   <div id="vOrders">
     <div class="tabbar">
-      <div class="syncbar"><span class="sdot" id="sdot"></span><span id="slbl">Loading...</span></div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div class="syncbar"><span class="sdot" id="sdot"></span><span id="slbl">Loading...</span></div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#666">
+          <span>USD rate:</span>
+          <input type="number" id="globalUsdRate" step="0.01" placeholder="e.g. 50.5" style="width:90px;margin:0;padding:4px 8px;font-size:13px" oninput="saveGlobalRate()" title="Default USD to EGP rate for new orders"/>
+          <span style="font-size:12px;color:#aaa">EGP</span>
+        </div>
+      </div>
       <div style="display:flex;gap:8px">
         <button class="btn blue" onclick="exportCSV()">Export CSV</button>
         <button class="btn green gs" onclick="openOrder()">+ new order</button>
@@ -375,6 +382,10 @@ tr.ds td{background:#fffbf4;}
   <div class="g21">
     <div><label>Total amount</label><input type="number" id="oTotal" placeholder="0" oninput="convHint()"/><div class="hint" id="oHint"></div></div>
     <div><label>Currency</label><select id="oCurr" onchange="convHint()"><option>EGP</option><option>USD</option><option>EUR</option><option>SAR</option><option>GBP</option><option>AED</option></select></div>
+  </div>
+  <div class="g2" id="oRateRow" style="display:none">
+    <div><label>Agreed exchange rate (EGP per 1 USD)</label><input type="number" id="oExchangeRate" placeholder="e.g. 50.5" step="0.01" oninput="convHint()"/><div class="hint" id="oRateHint"></div></div>
+    <div><label style="color:#888;font-size:11px">Default rate</label><div id="oDefaultRateDisplay" style="font-size:13px;color:#666;margin-top:6px"></div></div>
   </div>
   <div class="g2">
     <div><label>Payment</label><select id="oPay"><option>Unpaid</option><option>Partial</option><option>Paid</option></select></div>
@@ -600,6 +611,7 @@ async function login(){
     activityLog=await api('load-activity');
     if(!Array.isArray(activityLog))activityLog=[];
     populateMonths();
+    loadGlobalRate();
     sync('ok');
     showTab('dashboard');
     render();
@@ -636,7 +648,12 @@ function showTab(t){
 }
 
 function srt(k){if(sk===k)sd*=-1;else{sk=k;sd=-1;}render();}
-const egp=o=>toE(o.total||0,o.currency||'EGP');
+const egp=o=>{
+  if((o.currency||'EGP')==='USD'&&o.exchangeRate){
+    return (o.total||0)*o.exchangeRate;
+  }
+  return toE(o.total||0,o.currency||'EGP');
+};
 
 const today=new Date();today.setHours(0,0,0,0);
 const df=s=>{if(!s)return null;const d=new Date(s);d.setHours(0,0,0,0);return Math.round((d-today)/86400000);};
@@ -692,7 +709,7 @@ function render(){
         <td style="white-space:nowrap;color:#888">${o.date}</td>
         <td style="white-space:nowrap">${o.client}</td>
         <td style="max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#888" title="${o.products||''}">${o.products||'-'}</td>
-        <td style="font-weight:500;white-space:nowrap">${f(dv,dc)}${so?`<span class="cbadge">${f(o.total,o.currency)}</span>`:''}</td>
+        <td style="font-weight:500;white-space:nowrap">${f(dv,dc)}${so?`<span class="cbadge">${f(o.total,o.currency)}</span>`:''}${o.exchangeRate&&o.currency==='USD'?`<span class="cbadge" title="Agreed rate">${o.exchangeRate} EGP/USD</span>`:''}</td>
         <td><span class="badge ${PM[o.payment]}">${o.payment}</span></td>
         <td><span class="badge ${DM[o.delivery]}">${o.delivery}</span></td>
         <td>${dueTag(o.dueDate,o.payment)}<br><span style="font-size:11px;color:#aaa">follow-up: </span>${fuTag(o.followUp)}</td>
@@ -1248,6 +1265,7 @@ function openOrder(id){
     document.getElementById('oShipDate').value=o.shipDate||'';
     renderPaymentEntries(o.payments||[]);
     document.getElementById('oNotes').value=o.notes||'';
+    document.getElementById('oExchangeRate').value=o.exchangeRate||'';
     document.getElementById('oDestCountry').value=o.destinationCountry||'';
     document.getElementById('oPoNumber').value=o.poNumber||'';
     document.getElementById('oPortLoading').value=o.portLoading||'';
@@ -1259,8 +1277,11 @@ function openOrder(id){
     selectedArtisanWages={...(o.artisanWages||{})};
     document.getElementById('oDel3').style.display=cur.role==='manager'?'':'none';
   }else{
-    ['oId','oClient','oProducts','oNotes','oDestCountry','oPoNumber','oPortLoading','oPortDischarge','oShippingTerm','oConsigneeAddr'].forEach(i=>document.getElementById(i).value='');
+    ['oId','oClient','oProducts','oNotes','oDestCountry','oPoNumber','oPortLoading','oPortDischarge','oShippingTerm','oConsigneeAddr','oExchangeRate'].forEach(i=>document.getElementById(i).value='');
     document.getElementById('oDate').value=new Date().toISOString().slice(0,10);
+    // Auto-fill global rate for new orders
+    const defRate=localStorage.getItem('yadawee_usd_rate')||'';
+    document.getElementById('oExchangeRate').value=defRate;
     document.getElementById('oTotal').value='';
     document.getElementById('oCurr').value='EGP';
     document.getElementById('oPay').value='Unpaid';
@@ -1300,6 +1321,7 @@ async function saveOrder(){
     tracking:document.getElementById('oTracking').value.trim(),
     shipDate:document.getElementById('oShipDate').value,
     payments:getPaymentEntries(),
+    exchangeRate:parseFloat(document.getElementById('oExchangeRate').value)||null,
     destinationCountry:document.getElementById('oDestCountry').value.trim(),
     poNumber:document.getElementById('oPoNumber').value.trim(),
     portLoading:document.getElementById('oPortLoading').value.trim(),
@@ -1441,7 +1463,33 @@ async function saveExp(){
 function convHint(){
   const a=parseFloat(document.getElementById('oTotal').value)||0;
   const c=document.getElementById('oCurr').value;
-  document.getElementById('oHint').textContent=c!=='EGP'&&a?'approx EGP '+Math.round(toE(a,c)).toLocaleString():'';
+  const rateRow=document.getElementById('oRateRow');
+  const globalRate=parseFloat(document.getElementById('globalUsdRate').value)||R['USD'];
+  // Show rate row only for USD orders
+  if(rateRow) rateRow.style.display=c==='USD'?'':'none';
+  // Show default rate
+  const defDisp=document.getElementById('oDefaultRateDisplay');
+  if(defDisp) defDisp.textContent='1 USD = EGP '+(globalRate||'not set');
+  // Calculate hint using per-order rate if set, else global rate
+  const orderRate=parseFloat(document.getElementById('oExchangeRate').value);
+  const effectiveRate=orderRate||globalRate;
+  if(c==='USD'&&a&&effectiveRate){
+    document.getElementById('oHint').textContent='= EGP '+Math.round(a*effectiveRate).toLocaleString()+' (rate: '+effectiveRate+')';
+  } else if(c!=='EGP'&&a){
+    document.getElementById('oHint').textContent='approx EGP '+Math.round(toE(a,c)).toLocaleString();
+  } else {
+    document.getElementById('oHint').textContent='';
+  }
+}
+
+function saveGlobalRate(){
+  const rate=document.getElementById('globalUsdRate').value;
+  localStorage.setItem('yadawee_usd_rate', rate);
+}
+
+function loadGlobalRate(){
+  const rate=localStorage.getItem('yadawee_usd_rate');
+  if(rate) document.getElementById('globalUsdRate').value=rate;
 }
 
 function updateWageLabel(){
