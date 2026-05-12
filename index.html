@@ -380,6 +380,19 @@ tr.ds td{background:#fffbf4;}
     <div><label>Payment</label><select id="oPay"><option>Unpaid</option><option>Partial</option><option>Paid</option></select></div>
     <div><label>Delivery</label><select id="oDel2"><option>Pending</option><option>Confirmed</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option></select></div>
   </div>
+  <div class="slabel">Shipping details (for invoice)</div>
+  <div class="g2">
+    <div><label>Country of final destination</label><input type="text" id="oDestCountry" placeholder="e.g. Saudi Arabia"/></div>
+    <div><label>P.O. Number</label><input type="text" id="oPoNumber" placeholder="e.g. PO-2026-001"/></div>
+  </div>
+  <div class="g2">
+    <div><label>Port of loading</label><input type="text" id="oPortLoading" placeholder="e.g. Alexandria"/></div>
+    <div><label>Port of discharge</label><input type="text" id="oPortDischarge" placeholder="e.g. Jeddah"/></div>
+  </div>
+  <div class="g2">
+    <div><label>Shipping term</label><input type="text" id="oShippingTerm" placeholder="e.g. FOB, CIF"/></div>
+    <div><label>Consignee address</label><input type="text" id="oConsigneeAddr" placeholder="Client full address"/></div>
+  </div>
   <div class="slabel">Follow-up and reminders</div>
   <div class="g2">
     <div><label>Payment due date</label><input type="date" id="oDue"/></div>
@@ -1235,12 +1248,18 @@ function openOrder(id){
     document.getElementById('oShipDate').value=o.shipDate||'';
     renderPaymentEntries(o.payments||[]);
     document.getElementById('oNotes').value=o.notes||'';
+    document.getElementById('oDestCountry').value=o.destinationCountry||'';
+    document.getElementById('oPoNumber').value=o.poNumber||'';
+    document.getElementById('oPortLoading').value=o.portLoading||'';
+    document.getElementById('oPortDischarge').value=o.portDischarge||'';
+    document.getElementById('oShippingTerm').value=o.shippingTerm||'';
+    document.getElementById('oConsigneeAddr').value=o.consigneeAddress||'';
     // Set artisans and wages
     selectedArtisanIds=[...(o.artisans||[])];
     selectedArtisanWages={...(o.artisanWages||{})};
     document.getElementById('oDel3').style.display=cur.role==='manager'?'':'none';
   }else{
-    ['oId','oClient','oProducts','oNotes'].forEach(i=>document.getElementById(i).value='');
+    ['oId','oClient','oProducts','oNotes','oDestCountry','oPoNumber','oPortLoading','oPortDischarge','oShippingTerm','oConsigneeAddr'].forEach(i=>document.getElementById(i).value='');
     document.getElementById('oDate').value=new Date().toISOString().slice(0,10);
     document.getElementById('oTotal').value='';
     document.getElementById('oCurr').value='EGP';
@@ -1281,6 +1300,12 @@ async function saveOrder(){
     tracking:document.getElementById('oTracking').value.trim(),
     shipDate:document.getElementById('oShipDate').value,
     payments:getPaymentEntries(),
+    destinationCountry:document.getElementById('oDestCountry').value.trim(),
+    poNumber:document.getElementById('oPoNumber').value.trim(),
+    portLoading:document.getElementById('oPortLoading').value.trim(),
+    portDischarge:document.getElementById('oPortDischarge').value.trim(),
+    shippingTerm:document.getElementById('oShippingTerm').value.trim(),
+    consigneeAddress:document.getElementById('oConsigneeAddr').value.trim(),
     addedBy:cur.username,
     artisans:selArtisans,
     artisanWages:{...selectedArtisanWages},
@@ -1784,66 +1809,215 @@ function exportPaymentsCSV(){
 function generateInvoice(orderId){
   const o=orders.find(x=>x.id===orderId);
   if(!o)return;
+
+  // Parse products into rows
+  const productLines=(o.products||'Handmade products').split(',').map(s=>s.trim()).filter(Boolean);
+
+  // Build product rows - try to parse "Description xQty" format
+  const productRows=productLines.map(line=>{
+    const match=line.match(/^(.+?)\s*[xX]\s*(\d+)\s*$/);
+    if(match){
+      return {code:'',desc:match[1].trim(),qty:match[2],unit:'',amount:''};
+    }
+    return {code:'',desc:line,qty:'',unit:'',amount:''};
+  });
+
+  // Add empty rows to reach at least 5 rows
+  while(productRows.length<5) productRows.push({code:'',desc:'',qty:'',unit:'',amount:''});
+
+  const invDate=new Date().toLocaleDateString('en-GB');
   const w=window.open('','_blank');
-  const artNames=(o.artisans||[]).map(id=>{const a=artisans.find(x=>x.id===id);return a?a.name:'';}).filter(Boolean).join(', ');
-  const payments=(o.payments||[]);
-  const paidSoFar=payments.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
-  const outstanding=Math.round(egp(o))-paidSoFar;
-  w.document.write(`<!DOCTYPE html><html><head><title>Invoice ${o.id}</title>
-  <style>
-    body{font-family:Arial,sans-serif;max-width:700px;margin:2rem auto;padding:2rem;color:#1a1a1a;}
-    .hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem;padding-bottom:1rem;border-bottom:2px solid #1D9E75;}
-    .logo{font-size:24px;font-weight:bold;color:#1D9E75;}
-    .inv-no{font-size:14px;color:#888;}
-    table{width:100%;border-collapse:collapse;margin:1rem 0;}
-    th,td{padding:10px;text-align:left;border-bottom:1px solid #e8e8e4;}
-    th{background:#f5f5f3;font-weight:500;font-size:13px;color:#666;}
-    .total-row{font-weight:bold;font-size:15px;}
-    .status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;}
-    .paid{background:#EAF3DE;color:#3B6D11;}
-    .unpaid{background:#FCEBEB;color:#A32D2D;}
-    .partial{background:#FAEEDA;color:#854F0B;}
-    .footer{margin-top:3rem;padding-top:1rem;border-top:1px solid #e8e8e4;font-size:12px;color:#888;text-align:center;}
-    @media print{body{margin:0;padding:1rem;}}
-  </style>
-  </head><body>
-  <div class="hdr">
-    <div><div class="logo">Yadawee</div><div style="font-size:13px;color:#888;margin-top:4px">Social Enterprise</div></div>
-    <div style="text-align:right">
-      <div style="font-size:20px;font-weight:bold">INVOICE</div>
-      <div class="inv-no">${o.id}</div>
-      <div class="inv-no">Date: ${o.date}</div>
-      ${o.dueDate?`<div class="inv-no">Due: ${o.dueDate}</div>`:''}
-    </div>
+  w.document.write(`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Proforma Invoice - ${o.id}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:Arial,sans-serif;font-size:11px;color:#1a1a1a;background:#fff;padding:20px;}
+.page{max-width:750px;margin:0 auto;border:1px solid #ccc;}
+
+/* Header bar */
+.top-bar{background:#7B1E30;height:12px;}
+
+/* Header section */
+.header{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;padding:12px 16px 8px;}
+.shipper-info{font-size:10px;line-height:1.6;}
+.shipper-info .label{font-weight:bold;font-size:11px;}
+.logo-center{text-align:center;}
+.logo-center img{max-width:120px;max-height:80px;}
+.logo-placeholder{text-align:center;font-size:22px;font-weight:bold;color:#7B1E30;line-height:1.2;}
+.logo-placeholder small{display:block;font-size:8px;font-weight:normal;color:#888;letter-spacing:2px;}
+.invoice-fields{font-size:10px;}
+.inv-title{background:#7B1E30;color:#fff;text-align:right;padding:4px 8px;font-size:18px;font-weight:bold;margin-bottom:8px;}
+.field-row{display:flex;align-items:center;margin-bottom:4px;border-bottom:1px solid #ccc;padding-bottom:3px;}
+.field-label{font-weight:bold;font-size:10px;white-space:nowrap;margin-right:6px;min-width:140px;}
+.field-value{font-size:10px;flex:1;}
+
+/* Consignee */
+.consignee-bar{background:#7B1E30;color:#fff;font-weight:bold;font-size:10px;padding:3px 16px;}
+.consignee-body{padding:6px 16px;font-size:10px;min-height:30px;border-bottom:1px solid #ccc;}
+
+/* Payment terms */
+.terms-label{font-weight:bold;font-size:10px;padding:4px 16px 2px;}
+.terms-box{margin:0 16px 6px;border:1px solid #ccc;text-align:center;padding:4px;font-size:10px;}
+.terms-note{text-align:center;font-size:9px;color:#555;margin-bottom:6px;}
+.terms-note strong{color:#000;}
+
+/* Products table */
+table.products{width:calc(100% - 32px);margin:0 16px 0;border-collapse:collapse;font-size:10px;}
+table.products th{background:#7B1E30;color:#fff;padding:4px 6px;text-align:center;border:1px solid #7B1E30;}
+table.products td{border:1px solid #ccc;padding:4px 6px;height:20px;}
+table.products .desc-col{width:45%;}
+table.products .center{text-align:center;}
+table.products .right{text-align:right;}
+.handmade-row td{font-size:9px;color:#555;text-align:center;border-top:none;border:1px solid #ccc;}
+
+/* Banking & totals */
+.bottom-section{display:grid;grid-template-columns:1fr 200px;margin:0 16px;}
+.banking{background:#FFD700;padding:6px 8px;font-size:9px;line-height:1.7;}
+.banking .bank-title{font-weight:bold;font-size:10px;margin-bottom:4px;}
+.banking .bank-detail{color:#7B1E30;font-weight:bold;}
+.totals-table{border-collapse:collapse;font-size:10px;width:100%;}
+.totals-table td{padding:3px 6px;border:1px solid #ccc;}
+.totals-table .grand{background:#FFD700;font-weight:bold;}
+.totals-table .label-col{font-weight:bold;}
+.totals-table .amount-col{text-align:right;border-left:1px solid #ccc;}
+
+/* Remarks */
+.remarks-label{font-weight:bold;font-size:10px;padding:6px 16px 2px;}
+.remarks-body{padding:2px 16px 6px;font-size:9px;line-height:1.5;color:#333;border-bottom:1px solid #ccc;}
+
+/* Signatory */
+.signatory{display:grid;grid-template-columns:1fr 1fr;padding:8px 16px;font-size:10px;gap:16px;}
+.sig-label{font-weight:bold;margin-bottom:4px;}
+.ref{text-align:right;padding:4px 16px;font-size:9px;color:#555;}
+
+@media print{
+  body{padding:0;}
+  .page{border:none;max-width:100%;}
+  .no-print{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="no-print" style="text-align:center;margin-bottom:12px">
+  <button onclick="window.print()" style="background:#7B1E30;color:#fff;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:13px">Print / Save as PDF</button>
+  <button onclick="window.close()" style="margin-left:8px;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:13px">Close</button>
+</div>
+
+<div class="page">
+<div class="top-bar"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <!-- Shipper info -->
+  <div class="shipper-info">
+    <div class="label">Shipper</div>
+    Yadawee (Egyptian Arts &amp; Crafts)<br>
+    Block 90, 4th Touristic Village, 6 October City<br>
+    Cairo - EGYPT<br>
+    P: (+2) 012 2356 90 98<br>
+    Email: Sarah@yadawee.com
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem">
-    <div><div style="font-size:12px;color:#888;margin-bottom:4px">BILLED TO</div><div style="font-size:16px;font-weight:500">${o.client}</div></div>
-    <div><div style="font-size:12px;color:#888;margin-bottom:4px">STATUS</div><span class="status ${o.payment.toLowerCase()}">${o.payment}</span></div>
+
+  <!-- Logo center -->
+  <div class="logo-center">
+    <div class="logo-placeholder">CSH<br><small>EST. 2001</small><br>YADAWEE<br><small>MORE THAN HANDICRAFTS</small></div>
   </div>
-  <table>
-    <thead><tr><th>Description</th><th style="text-align:right">Amount</th></tr></thead>
-    <tbody>
-      <tr><td>${o.products||'Handicraft products'}</td><td style="text-align:right;font-weight:500">${o.currency} ${o.total.toLocaleString()}</td></tr>
-      ${artNames?`<tr><td style="font-size:12px;color:#888">Artisans: ${artNames}</td><td></td></tr>`:''}
-    </tbody>
+
+  <!-- Invoice fields -->
+  <div class="invoice-fields">
+    <div class="inv-title">Invoice</div>
+    <div class="field-row"><span class="field-label">Proforma Invoice Number</span><span class="field-value">${o.id}</span></div>
+    <div class="field-row"><span class="field-label">Proforma Invoice Date</span><span class="field-value">${invDate}</span></div>
+    <div class="field-row"><span class="field-label">Country of Origin of Goods</span><span class="field-value">Egypt</span></div>
+    <div class="field-row"><span class="field-label">Country of Final Destination</span><span class="field-value">${o.destinationCountry||''}</span></div>
+    <div class="field-row"><span class="field-label">Port of Loading</span><span class="field-value">${o.portLoading||''}</span></div>
+    <div class="field-row"><span class="field-label">Port of Discharge</span><span class="field-value">${o.portDischarge||''}</span></div>
+    <div class="field-row"><span class="field-label">P.O. No.</span><span class="field-value">${o.poNumber||''}</span></div>
+    <div class="field-row"><span class="field-label">Shipping term</span><span class="field-value">${o.shippingTerm||''}</span></div>
+  </div>
+</div>
+
+<!-- CONSIGNEE -->
+<div class="consignee-bar">Consignee</div>
+<div class="consignee-body">${o.client||''}<br>${o.consigneeAddress||''}</div>
+
+<!-- PAYMENT TERMS -->
+<div class="terms-label">Terms/Method of Payment</div>
+<div class="terms-box">50% In advance - 50% before Shipping</div>
+<div class="terms-note">Kindly make sure that all bank transfer charges are paid from your end and <strong>NOT</strong> shared with us.</div>
+
+<!-- PRODUCTS TABLE -->
+<table class="products">
+  <thead>
+    <tr>
+      <th style="width:15%">Product Code</th>
+      <th class="desc-col">Description of Goods</th>
+      <th style="width:10%">Quantity<br>Pcs</th>
+      <th style="width:13%">Unit Price<br>(USD)</th>
+      <th style="width:13%">Amount (USD)</th>
+    </tr>
+    <tr class="handmade-row">
+      <td colspan="5">handmade</td>
+    </tr>
+  </thead>
+  <tbody>
+    ${productRows.map(r=>`<tr>
+      <td>${r.code}</td>
+      <td>${r.desc}</td>
+      <td class="center">${r.qty}</td>
+      <td class="center">${r.unit}</td>
+      <td class="right">${r.amount}</td>
+    </tr>`).join('')}
+  </tbody>
+</table>
+
+<!-- BANKING & TOTALS -->
+<div class="bottom-section">
+  <div class="banking">
+    <div class="bank-title">Shipper Banking Information</div>
+    <div class="bank-detail">Bank Name: QNB Al Ahli Bank</div>
+    <div class="bank-detail">Branch: 6 October City (Distinguished District)</div>
+    <div class="bank-detail">Account Name: Yadawee Co.</div>
+    <div class="bank-detail">Account ID: 8006915009</div>
+    <div class="bank-detail">Account (USD): 20310214484 - 51</div>
+    <div class="bank-detail">Swift Code: QNBAEGCX</div>
+    <div class="bank-detail">IBAN: EG090037013008402031021448451</div>
+  </div>
+  <table class="totals-table">
+    <tr><td class="label-col">Sub Total</td><td class="amount-col">$ ${o.currency==='USD'?o.total.toLocaleString():'-'}</td></tr>
+    <tr><td class="label-col">Total Invoice</td><td class="amount-col">$ ${o.currency==='USD'?o.total.toLocaleString():'-'}</td></tr>
+    <tr><td class="label-col">Shipping</td><td class="amount-col">${o.shippingCost||'-'}</td></tr>
+    <tr class="grand"><td class="label-col">Grand Total</td><td class="amount-col">$ ${o.currency==='USD'?o.total.toLocaleString():'-'}</td></tr>
   </table>
-  <div style="display:flex;justify-content:flex-end">
-    <table style="width:280px">
-      <tr><td>Subtotal</td><td style="text-align:right">${o.currency} ${o.total.toLocaleString()}</td></tr>
-      ${payments.length?payments.map(p=>`<tr><td style="color:#1D9E75">Payment received (${p.date})</td><td style="text-align:right;color:#1D9E75">- EGP ${(parseFloat(p.amount)||0).toLocaleString()}${p.note?' ('+p.note+')':''}</td></tr>`).join(''):''}
-      <tr class="total-row" style="border-top:2px solid #1a1a1a">
-        <td>Outstanding</td>
-        <td style="text-align:right;color:${outstanding>0?'#E24B4A':'#1D9E75'}">EGP ${outstanding.toLocaleString()}</td>
-      </tr>
-    </table>
+</div>
+
+<!-- REMARKS -->
+<div class="remarks-label">Additional Remarks</div>
+<div class="remarks-body">
+  This is NOT your final Invoice. This is a confirmation of your order, rates and payment terms. Please read carefully to make sure all information is correct. Please sign the document and return us a copy as confirmation. Your commercial invoice will be issued at the time of shipment.
+  ${o.notes?'<br><br>'+o.notes:''}
+</div>
+
+<!-- SIGNATORY -->
+<div class="signatory">
+  <div>
+    <div class="sig-label">Signatory Company</div>
+    Yadawee Co.
   </div>
-  ${o.courier||o.tracking?`<div style="margin-top:1.5rem;padding:12px;background:#f5f5f3;border-radius:8px;font-size:13px">
-    <strong>Shipping:</strong> ${o.courier||''} ${o.tracking?'· Tracking: '+o.tracking:''} ${o.shipDate?'· Ship date: '+o.shipDate:''}
-  </div>`:''}
-  ${o.notes?`<div style="margin-top:1rem;font-size:13px;color:#666"><strong>Notes:</strong> ${o.notes}</div>`:''}
-  <div class="footer">Thank you for your business · Yadawee Social Enterprise · Generated ${new Date().toLocaleDateString('en-GB')}</div>
-  <script>window.onload=()=>setTimeout(()=>window.print(),400);<\/script>
-  </body></html>`);
+  <div>
+    <div class="sig-label">Name and Title of Authorised Signatory</div>
+    Hisham El Gazzar, Export Manager (Managing Partner)<br>
+    <strong>Signature for: Yadawee Co.</strong>
+  </div>
+</div>
+
+<div class="ref">F/P-CO-7.1-01/03</div>
+</div>
+</body>
+</html>`);
   w.document.close();
 }
 
